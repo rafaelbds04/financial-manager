@@ -7,10 +7,12 @@ interface SingInInputProps {
     onChangeText: ((text: string) => void) | undefined
     keyboardType?: any
     type?: any
-    isPassword?: boolean | undefined
+    isPassword?: boolean | undefined,
+    autoCapitalize?: "none" | "sentences" | "words" | "characters" | undefined
 }
 
-const SingInInput: React.FC<SingInInputProps> = ({ placeholder, value, onChangeText, keyboardType, type, isPassword }) => {
+const SingInInput: React.FC<SingInInputProps> = ({ placeholder, value, onChangeText,
+    keyboardType, type, isPassword, autoCapitalize }) => {
 
     return (
         <View style={styles.inputContainer} >
@@ -22,6 +24,7 @@ const SingInInput: React.FC<SingInInputProps> = ({ placeholder, value, onChangeT
                 keyboardType={keyboardType}
                 textContentType={type}
                 secureTextEntry={isPassword}
+                autoCapitalize={autoCapitalize}
             />
         </View>
 

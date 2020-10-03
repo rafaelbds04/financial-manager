@@ -13,7 +13,9 @@ export default function Preload() {
     useEffect(() => {
         const checkToken = async () => {
             
-            const token = await AsyncStorage.getItem('token');
+            const config = await AsyncStorage.getItem('appConfig')
+            const { token } = config ? JSON.parse(config) : '';
+            
             if (token) {
                 const request = await api.checkToken(token);
                 if (request.status === 200) {

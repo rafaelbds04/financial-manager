@@ -1,5 +1,16 @@
-// const BASE_API = 'http://192.168.1.100:3000';
-const BASE_API = 'http://127.0.0.1:3000';
+/*
+  url: {
+    ios: localhost
+    android: {
+      android studio: 10.0.2.2,
+      genymotion: 10.0.3.2,
+      phone via usb: your ip
+    }
+  }
+*/
+// const BASE_API = 'http://127.0.0.1:3000';
+const BASE_API = 'http://192.168.1.100:3000';
+
 
 export default {
 
