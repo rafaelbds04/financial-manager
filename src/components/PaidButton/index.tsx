@@ -7,9 +7,7 @@ interface PaidButtonProps {
     onChange: Function,
 }
 
-
 const PaidButton: React.FC<PaidButtonProps> = ({ paid, onChange }) => {
-
     return (
         <View style={styles.inputContainer} >
             <Text style={styles.inputTitle}>Paid</Text>
@@ -32,7 +30,6 @@ const PaidButton: React.FC<PaidButtonProps> = ({ paid, onChange }) => {
             </View>
         </View>
     );
-
 }
 
 export default PaidButton;
