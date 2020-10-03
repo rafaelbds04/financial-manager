@@ -27,6 +27,7 @@ import SlidingUpPanel from 'rn-sliding-up-panel';
 export default function Home() {
 
     const navigation = useNavigation();
+    const currentHour = new Date().getHours();
 
     function handleNavigateTo(scrren: string) {
         navigation.navigate(scrren);
@@ -129,6 +130,10 @@ export default function Home() {
         }
     ]
 
+    function getGreeting() {
+        return currentHour < 12 ? 'Good Morning!' :
+            (currentHour < 6 ? 'Good Afternoon' : 'Good Night')
+    }
 
 
     const [dragRange, setDragRange] = useState({
@@ -145,7 +150,7 @@ export default function Home() {
             <>
                 <View style={styles.header}>
                     <View>
-                        <Text style={styles.title} >Good afternoon,</Text>
+                        <Text style={styles.title} >{getGreeting()},</Text>
                         <Text style={styles.subtitle} >Rafael Bernardino!</Text>
                     </View>
                     <View>
