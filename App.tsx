@@ -3,6 +3,8 @@ import React from 'react';
 import { AppLoading } from 'expo';
 import { SafeAreaView, Text, View } from 'react-native';
 
+import UserContextProvider from './src/contexts/UserContext';
+
 /**
  * Colors
  * primary #4643d3
@@ -12,7 +14,7 @@ import { SafeAreaView, Text, View } from 'react-native';
  * Reverse #f58218
  */
 
-import { Roboto_400Regular,Roboto_300Light , Roboto_500Medium, Roboto_700Bold, useFonts } from '@expo-google-fonts/roboto';
+import { Roboto_400Regular, Roboto_300Light, Roboto_500Medium, Roboto_700Bold, useFonts } from '@expo-google-fonts/roboto';
 import Routes from './src/routes';
 
 export default function App() {
@@ -25,10 +27,10 @@ export default function App() {
   }
 
   return (
-    <>
+    <UserContextProvider>
       <StatusBar style="auto" backgroundColor="transparent" translucent />
       <Routes />
-    </>
+    </UserContextProvider>
   );
 
 }
