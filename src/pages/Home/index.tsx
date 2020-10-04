@@ -69,21 +69,21 @@ export default function Home() {
     ]
 
     const shortcuts = [
-        {
+        { 
             name: 'Add \nExpense',
-            action: 'AddTransacion',
+            action: 'AddTransaction',
             icon: 'minussquareo',
             key: '1',
         },
         {
             name: 'Add \nIncome',
-            action: 'AddTransacion',
+            action: 'AddTransaction',
             icon: 'plussquareo',
             key: '2'
         },
         {
             name: 'To \nReceipt',
-            action: 'AddTransacion',
+            action: 'AddTransaction',
             icon: 'menufold',
             key: '3'
         },

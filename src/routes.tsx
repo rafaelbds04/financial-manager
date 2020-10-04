@@ -4,7 +4,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native'
 
 import Home from './pages/Home';
-import AddTransacion from './pages/AddTransaction/index';
+import AddTransaction from './pages/AddTransaction/index';
+import AttacmentCamera from './pages/AddTransaction/AttacmentCamera';
 import Preload from './pages/Preload/index';
 import SingIn from './pages/SingIn/index';
 
@@ -14,7 +15,8 @@ const Routes = () => {
     return (
         <NavigationContainer>
             <AppStack.Navigator
-                initialRouteName='Preload'
+                // initialRouteName='Preload'
+                initialRouteName='Home'
                 headerMode='none'
                 screenOptions={{
                     cardStyle: {
@@ -25,7 +27,10 @@ const Routes = () => {
                 <AppStack.Screen name='Preload' component={Preload} />
                 <AppStack.Screen name='SingIn' component={SingIn} />
                 <AppStack.Screen name='Home' component={Home} />
-                <AppStack.Screen name='AddTransacion' component={AddTransacion} />
+                <AppStack.Screen name='AddTransaction' component={AddTransaction} />
+                <AppStack.Screen name='AttacmentCamera' component={AttacmentCamera} />
+
+                
 
             </AppStack.Navigator>
 
