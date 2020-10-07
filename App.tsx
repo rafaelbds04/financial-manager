@@ -16,6 +16,7 @@ import UserContextProvider from './src/contexts/UserContext';
 
 import { Roboto_400Regular, Roboto_300Light, Roboto_500Medium, Roboto_700Bold, useFonts } from '@expo-google-fonts/roboto';
 import Routes from './src/routes';
+import FlashMessage from 'react-native-flash-message';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -30,6 +31,7 @@ export default function App() {
     <UserContextProvider>
       <StatusBar style="auto" backgroundColor="transparent" translucent />
       <Routes />
+      <FlashMessage position="top" />
     </UserContextProvider>
   );
 

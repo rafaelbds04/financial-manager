@@ -4,6 +4,7 @@ import { View, ActivityIndicator } from 'react-native';
 import Logo from '../../assets/logo.svg';
 import AsyncStorage from '@react-native-community/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { showMessage } from 'react-native-flash-message';
 import api from '../../services/api';
 
 export default function Preload() {
@@ -20,11 +21,17 @@ export default function Preload() {
                 const request = await api.checkToken(token);
                 if (request.status === 200) {
                     //TODO: ADD REDUCER AND CONTEXT API
+                    showMessage({
+                        message: 'Welcome back!',
+                        description: 'Logged in success.',
+                        type: "success",
+                        duration: 2300
+                    })
 
                     navigation.reset({
                         routes: [{ name: 'Home' }]
                     })
-
+                    
                 } else {
                     navigation.reset({
                         routes: [{ name: 'SingIn' }]
