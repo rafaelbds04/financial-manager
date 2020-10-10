@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { AreaChart, LineChart, StackedAreaChart, Grid } from 'react-native-svg-charts'
@@ -7,9 +7,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign } from '@expo/vector-icons';
 import { showMessage } from 'react-native-flash-message';
 
+
 import * as shape from 'd3-shape'
 
 import SlidingUpPanel from 'rn-sliding-up-panel';
+import api from '../../services/api';
+import { catchErrorMessage } from '../../services/utils';
+import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
+import { UserContext } from '../../contexts/UserContext';
+import { IState } from '../../reducers/UserReducer';
+import moment from 'moment';
 
 /**
  * Colors
@@ -29,6 +36,7 @@ export default function Home() {
 
     const navigation = useNavigation();
     const currentHour = new Date().getHours();
+    const { state: { name } }: any = useContext(UserContext);
 
     function handleNavigateTo(scrren: string) {
         navigation.navigate(scrren);
@@ -37,11 +45,12 @@ export default function Home() {
     const { height, width } = Dimensions.get('window');
 
     const data = [50, 10, 40, 95, 10, 60, 85, 91, 35, 53, 40, 24]
-
-    const summary = [
+    
+    const [summary, setSummary] = useState([
         {
             title: 'Revenues',
             value: 17200,
+            valueVisible: false,
             porcentege: 50,
             key: '1',
             color: '#37b55a'
@@ -49,13 +58,15 @@ export default function Home() {
         {
             title: 'Expenses',
             value: 100,
+            valueVisible: false,
             porcentege: 50,
             key: '2',
             color: '#4643d3'
         },
         {
-            title: 'To due',
+            title: 'Due',
             value: 100,
+            valueVisible: false,
             porcentege: 50,
             key: '3',
             color: '#f58218'
@@ -63,11 +74,13 @@ export default function Home() {
         {
             title: 'Overdue',
             value: 100,
+            valueVisible: false,
             porcentege: 50,
             key: '4',
             color: '#ff344c'
         }
-    ]
+    ]);
+
 
     const shortcuts = [
         {
@@ -131,10 +144,37 @@ export default function Home() {
         }
     ]
 
+    useEffect(() => {
+        (async () => {
+            fetchSummary();
+        })()
+    }, [])
+
     function getGreeting() {
         return currentHour < 12 ? 'Good Morning' :
-            (currentHour < 6 ? 'Good Afternoon' : 'Good Night')
+            (currentHour < 18 ? 'Good Afternoon' : 'Good Night')
     }
+
+    async function fetchSummary() {
+        try {
+            const getSummary = await api.getSumaryStats();
+            if (getSummary.error) throw getSummary.message;
+            const currentSummary = [...summary];
+            currentSummary[0] = { ...currentSummary[0], value: getSummary.revenue, valueVisible: true }; //Revenues
+            currentSummary[1] = { ...currentSummary[1], value: getSummary.expense, valueVisible: true }; //Expenses
+            currentSummary[2] = { ...currentSummary[2], value: getSummary.due, valueVisible: true }; //Due
+            currentSummary[3] = { ...currentSummary[3], value: getSummary.overDue, valueVisible: true }; //Over Due
+
+            setSummary(currentSummary);
+        } catch (error) {
+            catchErrorMessage(error);
+        }
+    }
+
+    async function fetchLasTransactions() {
+        
+    }
+    
 
 
     const [dragRange, setDragRange] = useState({
@@ -152,7 +192,7 @@ export default function Home() {
                 <View style={styles.header}>
                     <View>
                         <Text style={styles.title} >{getGreeting()},</Text>
-                        <Text style={styles.subtitle} >Rafael Bernardino!</Text>
+                        <Text style={styles.subtitle} >{name}!</Text>
                     </View>
                     <View>
                         <Image style={styles.profileImage}
@@ -168,25 +208,41 @@ export default function Home() {
                         keyExtractor={item => item.key}
                         renderItem={({ item }) => {
                             return (
-                                <View style={{
-                                    ...styles.summaryCard,
-                                    backgroundColor: item.color
-                                }}>
+                                <View style={[styles.summaryCard,
+                                { backgroundColor: item.color }]}>
+
                                     <View>
+
                                         <Text style={styles.summaryCardSubtitle}>
                                             {item.title}</Text>
-                                        <Text style={styles.summaryCardTitle}>
-                                            R${item.value}</Text>
-                                    </View>
 
-                                    <LineChart
-                                        style={{ height: 80 }}
-                                        data={data}
-                                        svg={{ stroke: 'rgb(255, 255, 255)', strokeWidth: 2 }}
-                                        curve={shape.curveNatural}
-                                        contentInset={{ top: 20, bottom: 2 }}
+
+                                        <ShimmerPlaceholder
+                                            height={20}
+                                            width={60}
+                                            shimmerStyle={{ borderRadius: 10, marginTop: 5 }}
+                                            visible={item.valueVisible}
+                                        >
+                                            <Text style={styles.summaryCardTitle}>
+                                                R${item.value}</Text>
+                                        </ShimmerPlaceholder>
+
+                                    </View>
+                                    <ShimmerPlaceholder
+                                        height={60}
+                                        width={185}
+                                        shimmerStyle={{ borderRadius: 10, marginTop: 20 }}
+                                        visible={item.valueVisible}
                                     >
-                                    </LineChart>
+                                        <LineChart
+                                            style={{ height: 80 }}
+                                            data={data}
+                                            svg={{ stroke: 'rgb(255, 255, 255)', strokeWidth: 2 }}
+                                            curve={shape.curveNatural}
+                                            contentInset={{ top: 20, bottom: 2 }}
+                                        >
+                                        </LineChart>
+                                    </ShimmerPlaceholder>
                                 </View>
                             )
                         }}

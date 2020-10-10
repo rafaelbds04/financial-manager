@@ -13,9 +13,28 @@ import { Attacment } from '../pages/AddTransaction/CodeScanner/index';
 */
 
 export interface Error {
-    error?: object
+    statusCode?: number,
+    message?: string,
+    error?: string
 }
 
+interface RemoteSummary extends Error {
+    due: number,
+    expense: number,
+    overDue: number,
+    revenue: number,
+}
+
+interface RemoteTransactions extends Error {
+    id: number
+    name: string
+    transactionType: CategoryType
+    amount: number
+    transactionDate: Date
+    dueDate?: Date
+    paid: boolean
+    category: Category
+}
 // const BASE_API = 'http://127.0.0.1:3000';
 const BASE_API = 'http://192.168.1.100:3000';
 
@@ -117,6 +136,40 @@ export default {
                     'cookie': `${token}`
                 },
                 body: transactionFormData
+            })
+            const response = await req.json();
+            return { ...response, statusCode: req.status };
+        } catch (error) {
+            throw error.message
+        }
+    },
+    getSumaryStats: async (): Promise<RemoteSummary> => {
+        try {
+            const config = await AsyncStorage.getItem('appConfig');
+            const { token } = config && JSON.parse(config);
+            const req = await fetch(`${BASE_API}/stats/`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'cookie': `${token}`
+                },
+            })
+            const response = await req.json();
+            return { ...response, statusCode: req.status };
+        } catch (error) {
+            throw error.message
+        }
+    },
+    getLastTransactions: async (): Promise<RemoteTransactions> => {
+        try {
+            const config = await AsyncStorage.getItem('appConfig');
+            const { token } = config && JSON.parse(config);
+            const req = await fetch(`${BASE_API}/stats/`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'cookie': `${token}`
+                },
             })
             const response = await req.json();
             return { ...response, statusCode: req.status };

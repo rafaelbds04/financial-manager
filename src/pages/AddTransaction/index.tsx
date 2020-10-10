@@ -183,8 +183,7 @@ const AddTransaction = () => {
         try {
             const response = await api.addTransaction(formData);
             if (response.statusCode != 201) {
-                catchErrorMessage(response.message);
-                return
+                throw response.message
             }
             showMessage({
                 message: 'Transaction created success!',

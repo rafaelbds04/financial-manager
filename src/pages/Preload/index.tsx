@@ -1,26 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styles from './styles';
 import { View, ActivityIndicator } from 'react-native';
 import Logo from '../../assets/logo.svg';
 import AsyncStorage from '@react-native-community/async-storage';
+import { UserContext } from '../../contexts/UserContext';
 import { useNavigation } from '@react-navigation/native';
 import { showMessage } from 'react-native-flash-message';
 import api from '../../services/api';
 
 export default function Preload() {
-
+    const { dispatch }: any = useContext(UserContext);
     const navigation = useNavigation();
 
     useEffect(() => {
         const checkToken = async () => {
-            
+
             const config = await AsyncStorage.getItem('appConfig')
             const { token } = config ? JSON.parse(config) : '';
-            
+
             if (token) {
-                const request = await api.checkToken(token);
-                if (request.status === 200) {
+                const response = await api.checkToken(token);
+                if (response.status === 200) {
+                    console.log(response.name)
                     //TODO: ADD REDUCER AND CONTEXT API
+                    dispatch({
+                        type: 'setName',
+                        payload: {
+                            name: response.name
+                        }
+                    });
+
                     showMessage({
                         message: 'Welcome back!',
                         description: 'Logged in success.',
@@ -31,7 +40,7 @@ export default function Preload() {
                     navigation.reset({
                         routes: [{ name: 'Home' }]
                     })
-                    
+
                 } else {
                     navigation.reset({
                         routes: [{ name: 'SingIn' }]

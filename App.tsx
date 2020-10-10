@@ -3,7 +3,7 @@ import React from 'react';
 import { AppLoading } from 'expo';
 import { SafeAreaView, Text, View } from 'react-native';
 
-import UserContextProvider from './src/contexts/UserContext';
+import UserProvider from './src/contexts/UserContext';
 
 /**
  * Colors
@@ -28,11 +28,11 @@ export default function App() {
   }
 
   return (
-    <UserContextProvider>
+    <UserProvider>
       <StatusBar style="auto" backgroundColor="transparent" translucent />
       <Routes />
       <FlashMessage position="top" />
-    </UserContextProvider>
+    </UserProvider>
   );
 
 }

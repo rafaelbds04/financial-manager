@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styles from './styles';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Api from '../../services/api';
@@ -9,9 +9,10 @@ import api from '../../services/api';
 import AsyncStorage from '@react-native-community/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { showMessage } from 'react-native-flash-message';
+import { UserContext } from '../../contexts/UserContext';
 
 export default function SingIn() {
-
+    const { dispatch }: any = useContext(UserContext);
     const navigation = useNavigation();
 
     const [emailField, setEmailField] = useState('');
@@ -41,6 +42,12 @@ export default function SingIn() {
                 await AsyncStorage.setItem('appConfig', toAddConfig)
 
                 //TODO: ADD REDUCER AND CONTEXT API
+                dispatch({
+                    type: 'setName',
+                    payload: {
+                        name: response.name
+                    }
+                });
 
                 navigation.reset({
                     routes: [{ name: 'Home' }]
