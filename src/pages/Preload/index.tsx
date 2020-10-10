@@ -7,12 +7,14 @@ import { UserContext } from '../../contexts/UserContext';
 import { useNavigation } from '@react-navigation/native';
 import { showMessage } from 'react-native-flash-message';
 import api from '../../services/api';
+import { setMomentLocale } from '../../services/utils';
 
 export default function Preload() {
     const { dispatch }: any = useContext(UserContext);
     const navigation = useNavigation();
 
     useEffect(() => {
+        setMomentLocale();
         const checkToken = async () => {
 
             const config = await AsyncStorage.getItem('appConfig')
@@ -21,7 +23,7 @@ export default function Preload() {
             if (token) {
                 const response = await api.checkToken(token);
                 if (response.status === 200) {
-                    console.log(response.name)
+                    
                     //TODO: ADD REDUCER AND CONTEXT API
                     dispatch({
                         type: 'setName',

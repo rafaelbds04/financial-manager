@@ -26,14 +26,16 @@ interface RemoteSummary extends Error {
 }
 
 interface RemoteTransactions extends Error {
-    id: number
-    name: string
-    transactionType: CategoryType
-    amount: number
-    transactionDate: Date
-    dueDate?: Date
-    paid: boolean
-    category: Category
+    data: {
+        id: number
+        name: string
+        transactionType: CategoryType
+        amount: number
+        transactionDate: Date
+        dueDate?: Date
+        paid: boolean
+        category: Category
+    }[]
 }
 // const BASE_API = 'http://127.0.0.1:3000';
 const BASE_API = 'http://192.168.1.100:3000';
@@ -164,7 +166,7 @@ export default {
         try {
             const config = await AsyncStorage.getItem('appConfig');
             const { token } = config && JSON.parse(config);
-            const req = await fetch(`${BASE_API}/stats/`, {
+            const req = await fetch(`${BASE_API}/transactions/`, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',
@@ -172,7 +174,7 @@ export default {
                 },
             })
             const response = await req.json();
-            return { ...response, statusCode: req.status };
+            return { data: response, statusCode: req.status };
         } catch (error) {
             throw error.message
         }

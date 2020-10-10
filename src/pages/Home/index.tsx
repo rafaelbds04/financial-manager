@@ -17,6 +17,8 @@ import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
 import { UserContext } from '../../contexts/UserContext';
 import { IState } from '../../reducers/UserReducer';
 import moment from 'moment';
+import { Category, CategoryType } from '../AddTransaction';
+import TransactionCard from '../../components/TransactionCard';
 
 /**
  * Colors
@@ -32,6 +34,17 @@ import moment from 'moment';
  * 
  */
 
+export interface Transactions {
+    id: number
+    name: string
+    transactionType: CategoryType
+    amount: number
+    transactionDate: Date
+    dueDate?: Date
+    paid: boolean
+    category: Category
+}
+
 export default function Home() {
 
     const navigation = useNavigation();
@@ -45,7 +58,7 @@ export default function Home() {
     const { height, width } = Dimensions.get('window');
 
     const data = [50, 10, 40, 95, 10, 60, 85, 91, 35, 53, 40, 24]
-    
+
     const [summary, setSummary] = useState([
         {
             title: 'Revenues',
@@ -110,7 +123,9 @@ export default function Home() {
 
     ];
 
-    const transactions = [
+
+    const [transactions, setTransactions] = useState<Transactions[] | null>();
+    const transactionsAA = [
         {
             key: '1',
             title: 'Revenue',
@@ -146,7 +161,9 @@ export default function Home() {
 
     useEffect(() => {
         (async () => {
+            moment.locale('pt-br');
             fetchSummary();
+            fetchLastTransactions();
         })()
     }, [])
 
@@ -171,10 +188,23 @@ export default function Home() {
         }
     }
 
-    async function fetchLasTransactions() {
-        
+    async function fetchLastTransactions() {
+        try {
+            const response = await api.getLastTransactions();
+            if (response.error) throw response.message
+            //Sorting by date
+            const data = response.data.sort((a, b) => {
+                return Number(moment(b.transactionDate)) - Number(moment(a.transactionDate))
+            })
+            setTransactions(data);
+
+
+            console.log(response)
+        } catch (error) {
+            catchErrorMessage(error);
+        }
     }
-    
+
 
 
     const [dragRange, setDragRange] = useState({
@@ -215,7 +245,6 @@ export default function Home() {
 
                                         <Text style={styles.summaryCardSubtitle}>
                                             {item.title}</Text>
-
 
                                         <ShimmerPlaceholder
                                             height={20}
@@ -273,9 +302,6 @@ export default function Home() {
 
                                     <Text style={styles.shortcutsCardTtile} >{item.name}</Text>
                                 </TouchableOpacity>
-
-
-
                             );
                         }}
                     />
@@ -303,40 +329,12 @@ export default function Home() {
                         </View>
                         <View style={styles.slidingPanelContent}>
                             <FlatList
-                                data={transactions}
-                                keyExtractor={(item) => item.key}
+                                data={transactions?.slice(0,10)}
+                                showsHorizontalScrollIndicator={false}
+                                keyExtractor={(item) => item.id.toString()}
                                 renderItem={({ item }) => {
                                     return (
-                                        <View style={styles.transactionItemCard}>
-                                            <View style={{ flexDirection: 'row' }}>
-                                                <View style={styles.transactionItemIcon}>
-                                                    {item.credit ?
-                                                        <AntDesign name="arrowup"
-                                                            size={24} color="#43b864" />
-                                                        :
-                                                        <AntDesign name="arrowdown"
-                                                            size={24} color="#e95e51" />
-                                                    }
-
-                                                </View>
-
-                                                <View style={{ left: 30 }} >
-                                                    <Text style={styles.transactionItemTitle}>
-                                                        {item.title}</Text>
-                                                    <Text style={styles.transactionItemSubtitle} >
-                                                        5 Nov, 15:40</Text>
-                                                </View>
-
-                                            </View>
-                                            <View style={{ justifyContent: 'center' }}>
-                                                <Text style={{
-                                                    ...styles.transactionItemValue,
-                                                    color: `${item.credit ? '#43b864' : '#fff'}`
-                                                }} >
-                                                    {item.credit ? 'R$' : '- R$'} {item.amount}
-                                                </Text>
-                                            </View>
-                                        </View>
+                                        <TransactionCard data={item} />
                                     )
                                 }}
 
@@ -459,35 +457,5 @@ const styles = StyleSheet.create({
     },
     slidingPanelContent: {
         padding: 20
-    },
-    transactionItemCard: {
-        justifyContent: 'space-between',
-        marginTop: 20,
-        // backgroundColor: '#fff',
-        height: 45,
-        borderRadius: 5,
-        flexDirection: 'row',
-    },
-    transactionItemIcon: {
-        backgroundColor: '#fff',
-        borderRadius: 99,
-        height: 42,
-        width: 42,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    transactionItemTitle: {
-        fontFamily: 'Roboto_400Regular',
-        color: '#fff',
-        fontSize: 18,
-    },
-    transactionItemSubtitle: {
-        fontFamily: 'Roboto_300Light',
-        color: '#fff',
-    },
-    transactionItemValue: {
-        fontFamily: 'Roboto_700Bold',
-        color: '#fff',
-        fontSize: 18,
     }
 });
