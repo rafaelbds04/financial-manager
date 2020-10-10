@@ -65,7 +65,7 @@ export default function Home() {
             value: 100,
             porcentege: 50,
             key: '4',
-            color: 'red'
+            color: '#ff344c'
         }
     ]
 

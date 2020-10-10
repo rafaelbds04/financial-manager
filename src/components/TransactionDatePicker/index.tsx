@@ -22,6 +22,7 @@ const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({ paid, dat
         const currentDate = selectedDate || date;
         setShow(Platform.OS === 'ios');
         onChange(currentDate);
+        if(currentDate > dueDate) onChangeDue(currentDate)
     };
 
     const onChangeDueDate = (event: any, selectedDate: any) => {

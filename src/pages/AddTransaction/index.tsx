@@ -1,15 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, Text, Button, TouchableOpacity, Image, ScrollView } from 'react-native'
+import { View, TextInput, Text, TouchableOpacity, Image, ScrollView, FlatList, Modal } from 'react-native'
 import PageHeader from '../../components/PageHeader';
 import { AntDesign } from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import TransactionDatePicker from '../../components/TransactionDatePicker';
-import PaidButton from '../../components/PaidButton';
 import CategorySelector from '../../components/CategorySelector'
+import { showMessage } from 'react-native-flash-message';
+import api from '../../services/api';
+import { CategorySelectorItem } from '../../components/CategorySelector/index';
+import { Receipt, Attacment } from './CodeScanner/index';
+import { ImageViewer } from 'react-native-image-zoom-viewer';
+import { IImageInfo } from 'react-native-image-zoom-viewer/built/image-viewer.type';
+import DualButton from '../../components/DualButton';
+import { serialize } from 'object-to-formdata';
+import validators from '../../services/validators';
+import { catchErrorMessage } from '../../services/utils';
+import accounting from 'accounting';
+import styles from './styles';
 
 interface Params {
-    attachmentImage?: string | any;
+    attachmentImage?: string;
+    receipt?: Receipt;
+    type?: string;
+}
+
+export interface Category {
+    id: number
+    name: string
+    description: string
+    error?: string
+}
+
+export enum CategoryType {
+    EXPENSE = 'expense',
+    REVENUE = 'revenue'
 }
 
 const AddTransaction = () => {
@@ -18,29 +43,69 @@ const AddTransaction = () => {
     const route = useRoute();
     const routeParams = route.params as Params;
 
-    const [capturedAttachment, setCapturedAttachment] = useState<string>(null);
-
-
-    useEffect(() => {
-        if (routeParams?.attachmentImage) {
-            setCapturedAttachment(routeParams?.attachmentImage);
-        }
-    }, [routeParams?.attachmentImage]);
+    const [capturedAttachment, setCapturedAttachment] = useState<string | null>(null);
+    const [receiptAttachment, setReceiptAttachment] = useState<Attacment>();
+    const [attachmentsImages, setAttachmentsImages] = useState<IImageInfo[]>();
+    const [attachmentsModal, setAttachmentsModal] =
+        useState<{ visible: boolean, index?: number }>({ visible: false });
 
     const currentDate = new Date();
 
+    const [name, setName] = useState('');
     const [amount, setAmount] = useState('');
     const [paid, setPaid] = useState(true);
-
+    const [type, setType] = useState(true);
     const [date, setDate] = useState(currentDate);
     const [dueDate, setDueDate] = useState(currentDate);
+    const [selectedCategory, setSelectedCategory] = useState<string | number>('0');
+    const [categoriesItems, setCategoriesItems] = useState<CategorySelectorItem[]>([
+        { label: 'Loading', value: '0' }
+    ]);
 
-    const categoriesItems =
-        [
-            { label: 'Supermarket', value: 'uk' },
-            { label: 'Provider', value: 'france' },
-            { label: 'Salary', value: 'sl' },
-        ]
+    useEffect(() => {
+        (async () => {
+            if (routeParams?.type == 'revenue') setType(false);
+            try {
+                const categoryType = type ? CategoryType.EXPENSE : CategoryType.REVENUE
+                const response = await api.getCategoriesByType(categoryType);
+                if (!response.length) return
+                const data = response.map((item: Category) => {
+                    const data = {
+                        label: item.name,
+                        value: item.id
+                    };
+                    return data;
+                });
+                if (!data.length) return
+                setCategoriesItems(data);
+                setSelectedCategory(data[0].value)
+            } catch (error) {
+                catchErrorMessage(error)
+            }
+        })();
+    }, [type]);
+
+    useEffect(() => {
+        const images: IImageInfo[] = []
+        if (routeParams?.attachmentImage) {
+            setCapturedAttachment(routeParams?.attachmentImage);
+            images.push({
+                url: routeParams?.attachmentImage
+            })
+        }
+
+        if (routeParams?.receipt) {
+            autoFillFromReceipt(routeParams?.receipt);
+            if (!routeParams?.receipt?.attachment?.key) return
+
+            const imageUri = `http://192.168.1.100:3000/uploads/` +
+                `${routeParams?.receipt?.attachment?.key}.jpg`
+            imageUri && images.push({ url: imageUri });
+        }
+
+        setAttachmentsImages(images);
+    }, [routeParams?.attachmentImage, routeParams?.receipt]);
+
 
     function handleBack() {
         navigation.goBack();
@@ -50,27 +115,120 @@ const AddTransaction = () => {
         navigation.navigate('AttacmentCamera');
     }
 
+    function handleReadCodeFromReceipt() {
+        navigation.navigate('CodeScanner');
+    }
+
+    function handleChangeCategory(item: CategorySelectorItem) {
+        setSelectedCategory(item.value);
+    }
+
+    function autoFillFromReceipt(data: Receipt) {
+        const { emitter, emittedDate, totalAmount, attachment } = data;
+        emitter && setName(emitter);
+        totalAmount && setAmount(accounting.formatMoney(Number(data.totalAmount), {
+            decimal: ',',
+            thousand: '.',
+            precision: 2,
+            symbol: 'R$'
+        }).toString());
+        emittedDate && setDate(new Date(emittedDate));
+        attachment && setReceiptAttachment(attachment);
+
+    }
+
+    async function handleAddTransaction() {
+        const transactionInfos = {
+            name,
+            transactionType: type ? 'expense' : 'revenue',
+            amount: accounting.unformat(amount, ','),
+            transactionDate: date,
+            dueDate: !paid ? dueDate : undefined,
+            paid,
+            category: selectedCategory,
+        }
+        //If transaction is paid don't send due date
+        paid && delete transactionInfos.dueDate
+
+        const validate = await validators.validateTransactionCreate(transactionInfos);
+        if (validate != true) {
+            showMessage({
+                message: 'Error',
+                description: validate.message,
+                type: 'danger',
+                duration: 4000
+            })
+            return
+        }
+
+        //Serialize obj to formdata
+        const formData: FormData = serialize(transactionInfos)
+        //if exist receipt send with form
+        receiptAttachment?.id && formData
+            .append('receiptAttachment', receiptAttachment?.id.toString())
+
+        //if exist attachment send with form
+        capturedAttachment && formData.append('files', JSON.parse(JSON.stringify({
+            type: 'image',
+            uri: capturedAttachment,
+            name: capturedAttachment.split('/').pop()
+        })))
+
+        showMessage({
+            message: 'Sending your transaction!',
+            type: "info",
+            autoHide: false
+        })
+
+        try {
+            const response = await api.addTransaction(formData);
+            if (response.statusCode != 201) {
+                catchErrorMessage(response.message);
+                return
+            }
+            showMessage({
+                message: 'Transaction created success!',
+                type: 'success'
+            })
+            navigation.reset({
+                routes: [{ name: 'Home' }]
+            })
+        } catch (error) {
+            catchErrorMessage(error);
+        }
+
+    }
+
     return (
         <View style={styles.container}>
-
 
             < PageHeader title={'Add Transaction'} />
 
             <View style={styles.content} >
                 <ScrollView style={styles.body} showsVerticalScrollIndicator={false}  >
-
                     <View style={styles.inputContainer} >
-                        <Text style={styles.inputTitle} >Name {}</Text>
+                        <Text style={styles.inputTitle} >Name</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Name"
+                            value={name}
+                            onChangeText={(text) => setName(text)}
                         />
                     </View>
 
+                    <DualButton sectionName={'Type'} btn1Name={'Expense'}
+                        btn2Name={'Revenue'} value={type} onChange={setType} />
+
+                    <DualButton sectionName={'Paid'} btn1Name={'Paid'}
+                        btn2Name={'Not Paid'} value={paid} onChange={setPaid} />
+
+                    <TransactionDatePicker paid={paid} date={date} onChange={setDate}
+                        dueDate={dueDate} onChangeDue={setDueDate} />
+
                     <CategorySelector
                         items={categoriesItems}
-                        onChangeItem={(item: any) => console.log(item)}
-                        defaultValue='uk'
+                        defaultValue={selectedCategory}
+                        onChangeItem={handleChangeCategory}
                     />
 
                     <View style={styles.inputContainer} >
@@ -81,13 +239,8 @@ const AddTransaction = () => {
                             placeholder="Amount"
                             value={amount}
                             onChangeText={(text) => setAmount(text)}
-
                         />
                     </View>
-
-                    <PaidButton paid={paid} onChange={setPaid} />
-
-                    <TransactionDatePicker paid={paid} date={date} onChange={setDate} dueDate={dueDate} onChangeDue={setDueDate} />
 
                     <Text style={styles.inputTitle} >Attachments</Text>
                     <View style={styles.attachmentContainer} >
@@ -103,26 +256,42 @@ const AddTransaction = () => {
 
                         <TouchableOpacity
                             style={styles.attachmentInput}
-                            onPress={() => {
-
-                            }}
+                            onPress={() => { handleReadCodeFromReceipt() }}
                         >
                             <AntDesign name="scan1" size={24} color="black" />
                             <Text style={styles.attachmentInputText} >Read recip code</Text>
 
-                        </TouchableOpacity> 
+                        </TouchableOpacity>
                     </View>
 
-                    {capturedAttachment ? (
+                    {attachmentsImages && (
                         <View style={styles.attachmentImageContainer}>
-                            <Image style={styles.attachmentImage}
-                                source={{ uri: capturedAttachment }} 
-                                />
-                                
-                                
-                        </View>
-                    ) : (<></>)}
+                            <FlatList
+                                data={attachmentsImages}
+                                horizontal={true}
+                                showsHorizontalScrollIndicator={false}
+                                keyExtractor={item => item.url}
+                                renderItem={(data) => {
+                                    return (
+                                        <TouchableOpacity
+                                            onPress={() => setAttachmentsModal({
+                                                visible: true,
+                                                index: data.index
+                                            })}>
+                                            <Image style={styles.attachmentImage}
+                                                source={{ uri: data.item.url }} />
+                                        </TouchableOpacity>
+                                    )
+                                }}
+                            />
 
+                            <Modal visible={attachmentsModal?.visible} transparent={true}
+                                onRequestClose={() => setAttachmentsModal({ visible: false })}>
+                                <ImageViewer imageUrls={attachmentsImages} index={attachmentsModal.index}
+                                    enableSwipeDown={true} onCancel={() => setAttachmentsModal({ visible: false })} />
+                            </Modal>
+                        </View>
+                    )}
                 </ScrollView>
 
 
@@ -132,7 +301,7 @@ const AddTransaction = () => {
                     </TouchableOpacity>
 
                     <TouchableOpacity style={[styles.button,
-                    { backgroundColor: '#4643d3' }]} onPress={() => { }} >
+                    { backgroundColor: '#4643d3' }]} onPress={() => { handleAddTransaction() }} >
                         <Text style={styles.buttonText} >Add</Text>
                     </TouchableOpacity>
                 </View>
@@ -141,101 +310,5 @@ const AddTransaction = () => {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    content: {
-        marginTop: -35,
-        borderTopStartRadius: 40,
-        borderTopEndRadius: 40,
-        backgroundColor: '#fff',
-        flex: 1,
-        justifyContent: 'space-between',
-        padding: 40
-    },
-    body: {
-        // paddingStart: 24,
-    },
-    inputContainer: {
-        marginTop: 10,
-        marginBottom: 8,
-    },
-    input: {
-        height: 45,
-        backgroundColor: '#fff',
-        fontSize: 16,
-        // color: '#b9b9b9',
-        paddingLeft: 15,
-        borderRadius: 10,
-        borderWidth: 0.5,
-        borderColor: '#dedede'
-    },
-    inputTitle: {
-        color: '#b9b9b9',
-        fontSize: 12,
-        fontFamily: 'Roboto_500Medium'
-    },
-    attachmentContainer: {
-        marginTop: 10,
-        marginBottom: 8,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    attachmentImageContainer: {
-        marginTop: 10,
-        marginBottom: 8,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    attachmentImage: {
-        height: 220,
-        flex: 1,
-        marginHorizontal: 15,
-        borderRadius: 10,
-        borderWidth: 0.5,
-        borderColor: '#dedede',
-    },
-    attachmentInput: {
-        flex: 1,
-        height: 60,
-        marginHorizontal: 15,
-        borderRadius: 10,
-        borderWidth: 0.5,
-        borderColor: '#dedede',
-        // flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    attachmentInputIcon: {
-    },
-    attachmentInputText: {
-        fontFamily: 'Roboto_500Medium',
-        fontSize: 12,
-        paddingHorizontal: 10
-    },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        marginTop: 10
-    },
-    button: {
-        flex: 1,
-        height: 45,
-        marginHorizontal: 10,
-        // width: 130,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#e5e4f9',
-        borderRadius: 10
-    },
-    buttonText: {
-        fontFamily: 'Roboto_500Medium',
-        color: '#fff',
-    }
-})
-
 export default AddTransaction;
 
