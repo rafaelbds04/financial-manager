@@ -8,6 +8,7 @@ import SingInInput from '../../components/SingInInput';
 import api from '../../services/api';
 import AsyncStorage from '@react-native-community/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { showMessage } from 'react-native-flash-message';
 
 export default function SingIn() {
 
@@ -29,23 +30,36 @@ export default function SingIn() {
     const handleLoginClick = async () => {
         if (!(emailField && passwordField)) return alert('Fill the fields')
 
-        const response = await api.singIn(emailField, passwordField);
-        if (response.token) {
+        try {
+            const response = await api.singIn(emailField, passwordField);
+            if (response.token) {
 
-            const toAddConfig = JSON.stringify({
-                 token: response.token, 
-                 lastLoggedMail: emailField 
+                const toAddConfig = JSON.stringify({
+                    token: response.token,
+                    lastLoggedMail: emailField
                 })
-            await AsyncStorage.setItem('appConfig', toAddConfig)
+                await AsyncStorage.setItem('appConfig', toAddConfig)
 
-            //TODO: ADD REDUCER AND CONTEXT API
+                //TODO: ADD REDUCER AND CONTEXT API
 
-            navigation.reset({
-                routes: [{ name: 'Home' }]
+                navigation.reset({
+                    routes: [{ name: 'Home' }]
+                })
+            } else {
+                showMessage({
+                    message: 'Error during login',
+                    description: response.message,
+                    type: 'danger'
+                })
+            }
+        } catch (error) {
+            showMessage({
+                message: 'Error during login',
+                description: error,
+                type: 'danger'
             })
-        } else {
-            alert(response.message);
         }
+
     }
 
 
@@ -53,8 +67,8 @@ export default function SingIn() {
         <View style={styles.container}>
             <Logo width={120} height={120} fill='#37b55a' style={{ marginBottom: 30 }} />
             <View style={styles.inputArea} >
-                <SingInInput value={emailField} onChangeText={(t) => setEmailField(t)} placeholder='Email' 
-                type='emailAddress' autoCapitalize='none'
+                <SingInInput value={emailField} onChangeText={(t) => setEmailField(t)} placeholder='Email'
+                    type='emailAddress' autoCapitalize='none'
                 />
                 <SingInInput value={passwordField} onChangeText={(t) => setPasswordField(t)} placeholder='Password'
                     keyboardType='number-pad' type='password' isPassword={true} autoCapitalize='none' />

@@ -10,6 +10,11 @@ interface CategorySelectorProps {
     onChangeItem: (item: any, index: number) => void;
 }
 
+export interface CategorySelectorItem {
+    label: string,
+    value: string | number;
+}
+
 const CategorySelector: React.FC<CategorySelectorProps> = ({ items, defaultValue, onChangeItem }) => {
     return (
         <View style={styles.inputContainer} >

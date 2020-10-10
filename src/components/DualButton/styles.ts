@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     },
     optionContainer: {
         marginTop: 2,
-        height: 40,
+        height: 35,
         borderRadius: 10,
         borderWidth: 0.5,
         borderColor: '#dedede',

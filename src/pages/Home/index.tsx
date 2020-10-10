@@ -5,6 +5,7 @@ import { AreaChart, LineChart, StackedAreaChart, Grid } from 'react-native-svg-c
 import { useNavigation } from '@react-navigation/native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign } from '@expo/vector-icons';
+import { showMessage } from 'react-native-flash-message';
 
 import * as shape from 'd3-shape'
 
@@ -19,7 +20,7 @@ import SlidingUpPanel from 'rn-sliding-up-panel';
  * Reverse #f58218
  * Black #1e1e1e
  * 
- * Income: #37b55a
+ * Revenue: #37b55a
  * Expenses: #4643d3
  * 
  */
@@ -39,7 +40,7 @@ export default function Home() {
 
     const summary = [
         {
-            title: 'Income',
+            title: 'Revenues',
             value: 17200,
             porcentege: 50,
             key: '1',
@@ -57,26 +58,26 @@ export default function Home() {
             value: 100,
             porcentege: 50,
             key: '3',
-            color: 'red'
+            color: '#f58218'
         },
         {
             title: 'Overdue',
             value: 100,
             porcentege: 50,
             key: '4',
-            color: 'yellow'
+            color: 'red'
         }
     ]
 
     const shortcuts = [
-        { 
+        {
             name: 'Add \nExpense',
             action: 'AddTransaction',
             icon: 'minussquareo',
             key: '1',
         },
         {
-            name: 'Add \nIncome',
+            name: 'Add \nRevenue',
             action: 'AddTransaction',
             icon: 'plussquareo',
             key: '2'
@@ -89,7 +90,7 @@ export default function Home() {
         },
         {
             name: 'Accounts',
-            action: '',
+            action: 'AddTransaction',
             icon: 'creditcard',
             key: '4'
         },
@@ -131,7 +132,7 @@ export default function Home() {
     ]
 
     function getGreeting() {
-        return currentHour < 12 ? 'Good Morning!' :
+        return currentHour < 12 ? 'Good Morning' :
             (currentHour < 6 ? 'Good Afternoon' : 'Good Night')
     }
 
@@ -142,7 +143,7 @@ export default function Home() {
     });
 
     const _draggedValue = new Animated.Value(180);
-    const ModalRef = useRef(null);
+    const modalRef = useRef(null);
 
 
     return (
@@ -154,7 +155,8 @@ export default function Home() {
                         <Text style={styles.subtitle} >Rafael Bernardino!</Text>
                     </View>
                     <View>
-                        <Image style={styles.profileImage} source={{ uri: 'https://images.pexels.com/photos/936229/pexels-photo-936229.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260' }} />
+                        <Image style={styles.profileImage}
+                            source={{ uri: 'https://images.pexels.com/photos/936229/pexels-photo-936229.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260' }} />
                     </View>
                 </View>
 
@@ -166,10 +168,15 @@ export default function Home() {
                         keyExtractor={item => item.key}
                         renderItem={({ item }) => {
                             return (
-                                <View style={{ ...styles.summaryCard, backgroundColor: item.color }}>
+                                <View style={{
+                                    ...styles.summaryCard,
+                                    backgroundColor: item.color
+                                }}>
                                     <View>
-                                        <Text style={styles.summaryCardSubtitle}>{item.title}</Text>
-                                        <Text style={styles.summaryCardTitle}>R${item.value}</Text>
+                                        <Text style={styles.summaryCardSubtitle}>
+                                            {item.title}</Text>
+                                        <Text style={styles.summaryCardTitle}>
+                                            R${item.value}</Text>
                                     </View>
 
                                     <LineChart
@@ -223,7 +230,7 @@ export default function Home() {
             <View style={{ flex: 1 }}>
 
                 <SlidingUpPanel
-                    ref={ModalRef}
+                    ref={modalRef}
                     draggableRange={dragRange}
                     animatedValue={_draggedValue}
                     backdropOpacity={0}
@@ -248,21 +255,30 @@ export default function Home() {
                                             <View style={{ flexDirection: 'row' }}>
                                                 <View style={styles.transactionItemIcon}>
                                                     {item.credit ?
-                                                        <AntDesign name="arrowup" size={24} color="#43b864" />
+                                                        <AntDesign name="arrowup"
+                                                            size={24} color="#43b864" />
                                                         :
-                                                        <AntDesign name="arrowdown" size={24} color="#e95e51" />
+                                                        <AntDesign name="arrowdown"
+                                                            size={24} color="#e95e51" />
                                                     }
 
                                                 </View>
 
                                                 <View style={{ left: 30 }} >
-                                                    <Text style={styles.transactionItemTitle}>{item.title}</Text>
-                                                    <Text style={styles.transactionItemSubtitle} >5 Nov, 15:40</Text>
+                                                    <Text style={styles.transactionItemTitle}>
+                                                        {item.title}</Text>
+                                                    <Text style={styles.transactionItemSubtitle} >
+                                                        5 Nov, 15:40</Text>
                                                 </View>
 
                                             </View>
                                             <View style={{ justifyContent: 'center' }}>
-                                                <Text style={{ ...styles.transactionItemValue, color: `${item.credit ? '#43b864' : '#fff'}` }} > {item.credit ? 'R$' : '- R$'} {item.amount}</Text>
+                                                <Text style={{
+                                                    ...styles.transactionItemValue,
+                                                    color: `${item.credit ? '#43b864' : '#fff'}`
+                                                }} >
+                                                    {item.credit ? 'R$' : '- R$'} {item.amount}
+                                                </Text>
                                             </View>
                                         </View>
                                     )
