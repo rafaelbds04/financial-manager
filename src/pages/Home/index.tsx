@@ -1,9 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-<<<<<<< HEAD
 import { View, Text, Image, FlatList, TouchableOpacity, Dimensions, Animated, ScrollView } from 'react-native';
-=======
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Dimensions, Animated, ScrollView } from 'react-native';
->>>>>>> 07b5900b2c03d80f639a0ee91e843ef3a82852e4
 import { useNavigation } from '@react-navigation/native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign } from '@expo/vector-icons';
@@ -111,12 +107,6 @@ export default function Home() {
 
     ];
 
-<<<<<<< HEAD
-=======
-
-    const [transactions, setTransactions] = useState<Transactions[] | null>();
-
->>>>>>> 07b5900b2c03d80f639a0ee91e843ef3a82852e4
     useEffect(() => {
         (async () => {
             fetchSummary();
@@ -178,18 +168,6 @@ export default function Home() {
         })
     }
 
-<<<<<<< HEAD
-=======
-    const [dragRange, setDragRange] = useState({
-        top: height - 105,
-        bottom: height - 480
-    });
-
-    const _draggedValue = new Animated.Value(180);
-    const modalRef = useRef(null);
-
-
->>>>>>> 07b5900b2c03d80f639a0ee91e843ef3a82852e4
     return (
         <><View style={styles.container}>
             <View style={styles.header}>
@@ -236,10 +214,6 @@ export default function Home() {
                             </TouchableOpacity>
                         );
                     }} />
-<<<<<<< HEAD
-=======
-
->>>>>>> 07b5900b2c03d80f639a0ee91e843ef3a82852e4
             </LinearGradient>
         </View>
 
@@ -280,121 +254,5 @@ export default function Home() {
                     </View>
                 </SlidingUpPanel>
             </View></>
-<<<<<<< HEAD
     )
 }
-=======
-
-
-    )
-}
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingTop: 32,
-    },
-    header: {
-        paddingTop: 15,
-        paddingHorizontal: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-    },
-    title: {
-        fontSize: 21,
-        color: '#1e1e1e',
-        fontFamily: 'Roboto_700Bold'
-    },
-    subtitle: {
-        fontFamily: 'Roboto_400Regular',
-        fontSize: 19,
-        color: '#1e1e1e',
-        opacity: 0.6
-    },
-    profileImage: {
-        width: 55,
-        height: 55,
-        borderRadius: 40
-    },
-    summaryContainer: {
-        paddingTop: 10,
-        marginBottom: 10
-    },
-    summaryCard: {
-        padding: 20,
-        height: 160,
-        width: 220,
-        margin: 10,
-        borderRadius: 10,
-        backgroundColor: '#fff',
-    },
-    summaryCardTitle: {
-        color: '#fff',
-        fontSize: 20,
-        fontFamily: 'Roboto_700Bold'
-    },
-    summaryCardSubtitle: {
-        color: '#fff',
-        marginTop: -3,
-        fontSize: 15,
-        fontFamily: 'Roboto_400Regular',
-        opacity: 0.6
-    },
-    shortcutsContainerTitle: {
-        padding: 20,
-        fontSize: 22,
-        fontFamily: 'Roboto_700Bold',
-        color: '#1e1e1e'
-    },
-    shortcutsCardContainer: {
-        marginHorizontal: 10,
-        backgroundColor: '#fff',
-        height: 100,
-        width: 88,
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        paddingStart: 10,
-        paddingVertical: 15,
-        borderRadius: 15,
-    },
-    shortcutsCardTtile: {
-        paddingTop: 5,
-        fontSize: 13,
-        fontFamily: 'Roboto_700Bold',
-        color: '#1e1e1e'
-    },
-    slidingPanel: {
-        flex: 1,
-        backgroundColor: '#4643d3',
-        borderRadius: 50,
-    },
-    slidingPanelBottom: {
-        marginTop: 10,
-        width: 50,
-        height: 6,
-        alignSelf: 'center',
-        borderRadius: 99,
-        backgroundColor: '#6664d4'
-    },
-    slidingPanelHeader: {
-        paddingTop: 20,
-        paddingHorizontal: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    slidingPanelHeaderTitle: {
-        fontFamily: 'Roboto_700Bold',
-        fontSize: 18,
-        color: '#fff'
-    },
-    slidingPanelHeaderOptions: {
-        fontFamily: 'Roboto_300Light',
-        fontSize: 18,
-        color: '#fff'
-    },
-    slidingPanelContent: {
-        padding: 20
-    }
-});
->>>>>>> 07b5900b2c03d80f639a0ee91e843ef3a82852e4
