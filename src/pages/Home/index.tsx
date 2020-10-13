@@ -83,12 +83,14 @@ export default function Home() {
         {
             name: 'Add \nExpense',
             action: 'AddTransaction',
+            props: { type: 'expense' },
             icon: 'minussquareo',
             key: '1',
         },
         {
             name: 'Add \nRevenue',
             action: 'AddTransaction',
+            props: { type: 'revenue' },
             icon: 'plussquareo',
             key: '2'
         },
@@ -114,8 +116,8 @@ export default function Home() {
         })()
     }, [])
 
-    function handleNavigateTo(scrren: string) {
-        navigation.navigate(scrren);
+    function handleNavigateTo(scrren: string, props?: object) {
+        navigation.navigate(scrren, props);
     }
 
     function getGreeting() {
@@ -203,7 +205,7 @@ export default function Home() {
                     renderItem={({ item }) => {
                         return (
                             <TouchableOpacity
-                                onPress={() => { handleNavigateTo(item.action); }}
+                                onPress={() => { handleNavigateTo(item.action, item.props); }}
                                 style={styles.shortcutsCardContainer}
                             >
                                 <View>
