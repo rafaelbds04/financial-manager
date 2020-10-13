@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { Category, CategoryType } from '../../pages/AddTransaction';
+import { View, Text } from 'react-native';
+import { CategoryType } from '../../pages/AddTransaction';
 import styles from './styles';
 import { AntDesign } from '@expo/vector-icons';
 import { Transactions } from '../../pages/Home';
@@ -22,17 +22,13 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ data }) => {
                         <AntDesign name="arrowdown"
                             size={24} color="#e95e51" />
                     }
-
                 </View>
-
                 <View style={{ left: 30 }} >
                     <Text style={styles.transactionItemTitle}>
                         {data.name.length < 15 ? data.name : `${data.name.substring(0, 15)}...`}</Text>
                     <Text style={styles.transactionItemSubtitle} >
                         {moment(data.transactionDate).format('DD MMM, HH:mm')}</Text>
-                    {/* 5 Nov, 15:40</Text> */}
                 </View>
-
             </View>
             <View style={{ justifyContent: 'center' }}>
                 <Text style={{
