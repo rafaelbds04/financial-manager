@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     transactionItemValue: {
         fontFamily: 'Roboto_700Bold',
         color: '#fff',
-        fontSize: 18,
+        fontSize: 17,
     }
 });
 

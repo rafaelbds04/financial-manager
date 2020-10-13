@@ -62,9 +62,10 @@ const AddTransaction = () => {
         { label: 'Loading', value: '0' }
     ]);
 
+    useEffect(() => { (routeParams?.type == 'revenue') && setType(false) }, [])
+
     useEffect(() => {
         (async () => {
-            if (routeParams?.type == 'revenue') setType(false);
             try {
                 const categoryType = type ? CategoryType.EXPENSE : CategoryType.REVENUE
                 const response = await api.getCategoriesByType(categoryType);

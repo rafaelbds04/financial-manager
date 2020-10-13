@@ -5,6 +5,7 @@ import styles from './styles';
 import { AntDesign } from '@expo/vector-icons';
 import { Transactions } from '../../pages/Home';
 import moment from 'moment';
+import accounting from 'accounting';
 
 interface TransactionCardProps {
     data: Transactions
@@ -35,7 +36,13 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ data }) => {
                     ...styles.transactionItemValue,
                     color: `${data.transactionType == CategoryType.REVENUE ? '#43b864' : '#fff'}`
                 }} >
-                    {data.transactionType == CategoryType.REVENUE ? 'R$' : '- R$'} {data.amount}
+                    {data.transactionType == CategoryType.REVENUE ? '' : '-'}
+                    {accounting.formatMoney(Number(data.amount), {
+                        decimal: ',',
+                        thousand: '.',
+                        precision: 2,
+                        symbol: 'R$'
+                    }).toString()}
                 </Text>
             </View>
         </View>
