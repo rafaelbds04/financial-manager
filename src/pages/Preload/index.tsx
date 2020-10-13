@@ -7,7 +7,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { useNavigation } from '@react-navigation/native';
 import { showMessage } from 'react-native-flash-message';
 import api from '../../services/api';
-import { setMomentLocale } from '../../services/utils';
+import { catchErrorMessage, setMomentLocale } from '../../services/utils';
 
 export default function Preload() {
     const { dispatch }: any = useContext(UserContext);
@@ -20,45 +20,47 @@ export default function Preload() {
             const config = await AsyncStorage.getItem('appConfig')
             const { token } = config ? JSON.parse(config) : '';
 
-            if (token) {
-                const response = await api.checkToken(token);
-                if (response.status === 200) {
-                    
-                    //TODO: ADD REDUCER AND CONTEXT API
-                    dispatch({
-                        type: 'setName',
-                        payload: {
-                            name: response.name
-                        }
-                    });
+            try {
+                if (token) {
+                    const response = await api.checkToken(token);
+                    if (response.status === 200) {
 
-                    showMessage({
-                        message: 'Welcome back!',
-                        description: 'Logged in success.',
-                        type: "success",
-                        duration: 2300
-                    })
+                        //TODO: ADD REDUCER AND CONTEXT API
+                        dispatch({
+                            type: 'setName',
+                            payload: {
+                                name: response.name
+                            }
+                        });
 
-                    navigation.reset({
-                        routes: [{ name: 'Home' }]
-                    })
+                        showMessage({
+                            message: 'Welcome back!',
+                            description: 'Logged in success.',
+                            type: "success",
+                            duration: 2300
+                        })
+
+                        navigation.reset({
+                            routes: [{ name: 'Home' }]
+                        })
+
+                    } else {
+                        navigation.reset({
+                            routes: [{ name: 'SingIn' }]
+                        })
+                    }
 
                 } else {
                     navigation.reset({
                         routes: [{ name: 'SingIn' }]
                     })
                 }
-
-            } else {
-                navigation.reset({
-                    routes: [{ name: 'SingIn' }]
-                })
+            } catch (error) {
+                catchErrorMessage(error);
             }
+
         }
         checkToken();
-
-
-
     }, []);
 
     return (

@@ -19,6 +19,7 @@ import { IState } from '../../reducers/UserReducer';
 import moment from 'moment';
 import { Category, CategoryType } from '../AddTransaction';
 import TransactionCard from '../../components/TransactionCard';
+import TransactionCardShimmer from '../../components/TransactionCardShimmer';
 
 /**
  * Colors
@@ -48,7 +49,8 @@ export interface Transactions {
 export default function Home() {
 
     const navigation = useNavigation();
-    const currentHour = new Date().getHours();
+    const currentDate = new Date()
+    const currentHour = currentDate.getHours();
     const { state: { name } }: any = useContext(UserContext);
 
     function handleNavigateTo(scrren: string) {
@@ -64,7 +66,7 @@ export default function Home() {
             title: 'Revenues',
             value: 17200,
             valueVisible: false,
-            porcentege: 50,
+            chartsData: [] as any,
             key: '1',
             color: '#37b55a'
         },
@@ -72,7 +74,7 @@ export default function Home() {
             title: 'Expenses',
             value: 100,
             valueVisible: false,
-            porcentege: 50,
+            chartsData: [] as any,
             key: '2',
             color: '#4643d3'
         },
@@ -80,7 +82,7 @@ export default function Home() {
             title: 'Due',
             value: 100,
             valueVisible: false,
-            porcentege: 50,
+            chartsData: [] as any,
             key: '3',
             color: '#f58218'
         },
@@ -88,7 +90,7 @@ export default function Home() {
             title: 'Overdue',
             value: 100,
             valueVisible: false,
-            porcentege: 50,
+            chartsData: [] as any,
             key: '4',
             color: '#ff344c'
         }
@@ -161,7 +163,6 @@ export default function Home() {
 
     useEffect(() => {
         (async () => {
-            moment.locale('pt-br');
             fetchSummary();
             fetchLastTransactions();
         })()
@@ -196,20 +197,33 @@ export default function Home() {
             const data = response.data.sort((a, b) => {
                 return Number(moment(b.transactionDate)) - Number(moment(a.transactionDate))
             })
+
             setTransactions(data);
-
-
-            console.log(response)
+            mountCharts(data);
         } catch (error) {
             catchErrorMessage(error);
         }
+    }
+    //TODO CHANGE TO SCROLL VIEW
+    function mountCharts(data: Transactions[]) {
+        const revenues = data.filter((item) => item.transactionType == CategoryType.REVENUE).map((item) => item.amount)
+        const expenses = data.filter((item) => item.transactionType == CategoryType.EXPENSE).map((item) => item.amount)
+        const due = data.filter((item) => item.transactionType == CategoryType.EXPENSE && item.paid == false).map((item) => item.amount)
+        const overDue = data.filter((item) => item.transactionType == CategoryType.EXPENSE && item.paid == false && moment(item.dueDate).format() < moment().format()).map((item) => item.amount)
+        const currentSummary = [...summary];
+        currentSummary[0].chartsData = revenues ? revenues : [0, 0];
+        currentSummary[1].chartsData = expenses ? expenses : [0, 0];
+        currentSummary[2].chartsData = due ? due : [0, 0];
+        currentSummary[3].chartsData = overDue ? overDue : [0, 0];
+
+        setSummary(currentSummary);
     }
 
 
 
     const [dragRange, setDragRange] = useState({
         top: height - 105,
-        bottom: 300
+        bottom: height - 480
     });
 
     const _draggedValue = new Animated.Value(180);
@@ -217,98 +231,95 @@ export default function Home() {
 
 
     return (
-        <View style={styles.container}>
-            <>
-                <View style={styles.header}>
-                    <View>
-                        <Text style={styles.title} >{getGreeting()},</Text>
-                        <Text style={styles.subtitle} >{name}!</Text>
-                    </View>
-                    <View>
-                        <Image style={styles.profileImage}
-                            source={{ uri: 'https://images.pexels.com/photos/936229/pexels-photo-936229.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260' }} />
-                    </View>
+        <><View style={styles.container}>
+
+            <View style={styles.header}>
+                <View>
+                    <Text style={styles.title}>{getGreeting()},</Text>
+                    <Text style={styles.subtitle}>{name}!</Text>
                 </View>
+                <View>
+                    <Image style={styles.profileImage}
+                        source={{ uri: 'https://images.pexels.com/photos/936229/pexels-photo-936229.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260' }} />
+                </View>
+            </View>
 
-                <View style={styles.summaryContainer}>
-                    <FlatList
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        data={summary}
-                        keyExtractor={item => item.key}
-                        renderItem={({ item }) => {
-                            return (
-                                <View style={[styles.summaryCard,
-                                { backgroundColor: item.color }]}>
+            <View style={styles.summaryContainer}>
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={summary}
+                    keyExtractor={item => item.key}
+                    renderItem={({ item }) => {
+                        return (
+                            <View style={[styles.summaryCard,
+                            { backgroundColor: item.color }]}>
 
-                                    <View>
+                                <View>
 
-                                        <Text style={styles.summaryCardSubtitle}>
-                                            {item.title}</Text>
+                                    <Text style={styles.summaryCardSubtitle}>
+                                        {item.title}</Text>
 
-                                        <ShimmerPlaceholder
-                                            height={20}
-                                            width={60}
-                                            shimmerStyle={{ borderRadius: 10, marginTop: 5 }}
-                                            visible={item.valueVisible}
-                                        >
-                                            <Text style={styles.summaryCardTitle}>
-                                                R${item.value}</Text>
-                                        </ShimmerPlaceholder>
-
-                                    </View>
                                     <ShimmerPlaceholder
-                                        height={60}
-                                        width={185}
-                                        shimmerStyle={{ borderRadius: 10, marginTop: 20 }}
+                                        height={20}
+                                        width={60}
+                                        shimmerStyle={{ borderRadius: 10, marginTop: 5 }}
                                         visible={item.valueVisible}
                                     >
-                                        <LineChart
-                                            style={{ height: 80 }}
-                                            data={data}
-                                            svg={{ stroke: 'rgb(255, 255, 255)', strokeWidth: 2 }}
-                                            curve={shape.curveNatural}
-                                            contentInset={{ top: 20, bottom: 2 }}
-                                        >
-                                        </LineChart>
+                                        <Text style={styles.summaryCardTitle}>
+                                                R${item.value}</Text>
                                     </ShimmerPlaceholder>
+
                                 </View>
-                            )
-                        }}
-
-                    />
-                </View>
-
-                <LinearGradient
-                    colors={['#fefefe', '#efefef', '#fcfcfc']}
-                    style={{ paddingBottom: 30 }}
-                >
-                    <Text style={styles.shortcutsContainerTitle} >Shortcuts</Text>
-                    <FlatList
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        data={shortcuts}
-                        style={{ paddingHorizontal: 10 }}
-                        renderItem={({ item }) => {
-                            return (
-
-                                <TouchableOpacity
-                                    onPress={() => { handleNavigateTo(item.action) }}
-                                    style={styles.shortcutsCardContainer}
+                                <ShimmerPlaceholder
+                                    height={60}
+                                    width={185}
+                                    shimmerStyle={{ borderRadius: 10, marginTop: 20 }}
+                                    visible={(item.chartsData.length > 0)}
                                 >
-                                    <View  >
-                                        <AntDesign name={item.icon} size={24} color='#4543d3' />
-                                    </View>
+                                    <LineChart
+                                        style={{ height: 80 }}
+                                        data={data}
+                                        svg={{ stroke: 'rgb(255, 255, 255)', strokeWidth: 2 }}
+                                        curve={shape.curveNatural}
+                                        contentInset={{ top: 20, bottom: 2 }}
+                                    >
+                                    </LineChart>
+                                </ShimmerPlaceholder>
+                            </View>
+                        );
+                    } } />
+            </View>
 
-                                    <Text style={styles.shortcutsCardTtile} >{item.name}</Text>
-                                </TouchableOpacity>
-                            );
-                        }}
-                    />
+            <LinearGradient
+                colors={['#fefefe', '#efefef', '#fcfcfc']}
+                style={{ paddingBottom: 30 }}
+            >
+                <Text style={styles.shortcutsContainerTitle}>Shortcuts</Text>
+                <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={shortcuts}
+                    style={{ paddingHorizontal: 10 }}
+                    renderItem={({ item }) => {
+                        return (
 
-                </LinearGradient>
+                            <TouchableOpacity
+                                onPress={() => { handleNavigateTo(item.action); } }
+                                style={styles.shortcutsCardContainer}
+                            >
+                                <View>
+                                    <AntDesign name={item.icon} size={24} color='#4543d3' />
+                                </View>
 
-            </>
+                                <Text style={styles.shortcutsCardTtile}>{item.name}</Text>
+                            </TouchableOpacity>
+                        );
+                    } } />
+
+            </LinearGradient>
+        </View>
+
             <View style={{ flex: 1 }}>
 
                 <SlidingUpPanel
@@ -316,29 +327,34 @@ export default function Home() {
                     draggableRange={dragRange}
                     animatedValue={_draggedValue}
                     backdropOpacity={0}
-                    snappingPoints={[500]}
+                    snappingPoints={[400]}
                     height={height + 20}
                     friction={0.9}
                 >
 
                     <View style={styles.slidingPanel}>
-                        <View style={styles.slidingPanelBottom} ></View>
+                        <View style={styles.slidingPanelBottom}></View>
                         <View style={styles.slidingPanelHeader}>
                             <Text style={styles.slidingPanelHeaderTitle}>Transactions</Text>
                             <Text style={styles.slidingPanelHeaderOptions}>All</Text>
                         </View>
                         <View style={styles.slidingPanelContent}>
-                            <FlatList
-                                data={transactions?.slice(0,10)}
-                                showsHorizontalScrollIndicator={false}
-                                keyExtractor={(item) => item.id.toString()}
-                                renderItem={({ item }) => {
-                                    return (
-                                        <TransactionCard data={item} />
-                                    )
-                                }}
+                            {transactions ? (<>
+                                <FlatList
+                                    data={transactions?.slice(0, 10)}
+                                    showsHorizontalScrollIndicator={false}
+                                    keyExtractor={(item) => item.id.toString()}
+                                    renderItem={({ item }) => {
+                                        return (
+                                            <TransactionCard data={item} />
+                                        );
+                                    } } /></>) : (<>
+                                        <TransactionCardShimmer />
+                                        <TransactionCardShimmer />
+                                        <TransactionCardShimmer />
+                                        <TransactionCardShimmer />
+                                    </>)}
 
-                            />
 
                         </View>
 
@@ -346,9 +362,9 @@ export default function Home() {
 
                 </SlidingUpPanel>
 
-            </View>
+            </View></>
 
-        </View>
+        
     )
 }
 

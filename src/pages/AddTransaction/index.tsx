@@ -169,7 +169,7 @@ const AddTransaction = () => {
 
         //if exist attachment send with form
         capturedAttachment && formData.append('files', JSON.parse(JSON.stringify({
-            type: 'image',
+            type: 'image/jpeg',
             uri: capturedAttachment,
             name: capturedAttachment.split('/').pop()
         })))
