@@ -6,7 +6,7 @@ export default {
                 name: string().required(),
                 description: string().notRequired(),
                 transactionType: mixed().oneOf(['revenue', 'expense']),
-                amount: number().required(),
+                amount: number().min(0.01).required(),
                 transactionDate: date().required(),
                 dueDate: date().notRequired(),
                 paid: boolean().required(),

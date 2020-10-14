@@ -38,7 +38,8 @@ interface RemoteTransactions extends Error {
     }[]
 }
 // const BASE_API = 'http://127.0.0.1:3000';
-const BASE_API = 'http://192.168.1.100:3000';
+// const BASE_API = 'http://192.168.1.100:3000'; 
+const BASE_API = 'https://financeapi.diskquentinha.com.br';
 
 interface ReceiptResponse {
     response: {
@@ -142,7 +143,7 @@ export default {
             const response = await req.json();
             return { ...response, statusCode: req.status };
         } catch (error) {
-            throw error.message
+            throw error
         }
     },
     getSumaryStats: async (): Promise<RemoteSummary> => {
@@ -159,7 +160,7 @@ export default {
             const response = await req.json();
             return { ...response, statusCode: req.status };
         } catch (error) {
-            throw error.message
+            throw error
         }
     },
     getLastTransactions: async (): Promise<RemoteTransactions> => {

@@ -81,7 +81,7 @@ const AddTransaction = () => {
                 setCategoriesItems(data);
                 setSelectedCategory(data[0].value)
             } catch (error) {
-                catchErrorMessage(error)
+                catchErrorMessage(error?.message)
             }
         })();
     }, [type]);
@@ -98,9 +98,7 @@ const AddTransaction = () => {
         if (routeParams?.receipt) {
             autoFillFromReceipt(routeParams?.receipt);
             if (!routeParams?.receipt?.attachment?.key) return
-
-            const imageUri = `http://192.168.1.100:3000/uploads/` +
-                `${routeParams?.receipt?.attachment?.key}.jpg`
+            const imageUri = routeParams?.receipt?.attachment?.url;
             imageUri && images.push({ url: imageUri });
         }
 
@@ -194,7 +192,7 @@ const AddTransaction = () => {
                 routes: [{ name: 'Home' }]
             })
         } catch (error) {
-            catchErrorMessage(error);
+            catchErrorMessage(error?.message);
         }
 
     }

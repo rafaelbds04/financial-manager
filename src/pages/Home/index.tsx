@@ -161,12 +161,12 @@ export default function Home() {
         const expenseData = data.filter((item) => item.transactionType == CategoryType.EXPENSE).map((item) => Number(item.amount))
         const dueData = data.filter((item) => item.transactionType == CategoryType.EXPENSE && item.paid == false).map((item) => Number(item.amount))
         const overDueData = data.filter((item) => item.transactionType == CategoryType.EXPENSE && item.paid == false && moment(item.dueDate).format() < moment().format()).map((item) => Number(item.amount))
-
+        
         setChartsData({
-            revenue: revenueData ? revenueData : [0, 0],
-            expense: expenseData ? expenseData : [0, 0],
-            due: dueData ? dueData : [0, 0],
-            overDue: overDueData ? overDueData : [0, 0]
+            revenue: revenueData.length > 1 ? revenueData : [0, 0],
+            expense: expenseData.length > 1 ? expenseData : [0, 0],
+            due: dueData.length > 1 ? dueData : [0, 0],
+            overDue: overDueData.length > 1 ? overDueData : [0, 0]
         })
     }
 
