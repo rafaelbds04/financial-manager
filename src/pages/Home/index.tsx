@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, Dimensions, Animated, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import { LinearGradient } from 'expo-linear-gradient';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import SlidingUpPanel from 'rn-sliding-up-panel';
 import api from '../../services/api';
@@ -81,27 +81,27 @@ export default function Home() {
 
     const shortcuts = [
         {
-            name: 'Add \nExpense',
+            name: 'Adicionar \nDespesa',
             action: 'AddTransaction',
             props: { type: 'expense' },
             icon: 'minussquareo',
             key: '1',
         },
         {
-            name: 'Add \nRevenue',
+            name: 'Adicionar \nReceita',
             action: 'AddTransaction',
             props: { type: 'revenue' },
             icon: 'plussquareo',
             key: '2'
         },
+        // {
+        //     name: 'Recebimentos \nFuturos',
+        //     action: 'AddTransaction',
+        //     icon: 'menufold',
+        //     key: '3'
+        // },
         {
-            name: 'To \nReceipt',
-            action: 'AddTransaction',
-            icon: 'menufold',
-            key: '3'
-        },
-        {
-            name: 'Accounts',
+            name: 'Contas \n',
             action: 'AddTransaction',
             icon: 'creditcard',
             key: '4'
@@ -121,8 +121,8 @@ export default function Home() {
     }
 
     function getGreeting() {
-        return currentHour < 12 ? 'Good Morning' :
-            (currentHour < 18 ? 'Good Afternoon' : 'Good Night')
+        return currentHour < 12 ? 'Bom dia' :
+            (currentHour < 18 ? 'Boa tarde' : 'Boa noite')
     }
 
     async function fetchSummary() {
@@ -161,7 +161,7 @@ export default function Home() {
         const expenseData = data.filter((item) => item.transactionType == CategoryType.EXPENSE).map((item) => Number(item.amount))
         const dueData = data.filter((item) => item.transactionType == CategoryType.EXPENSE && item.paid == false).map((item) => Number(item.amount))
         const overDueData = data.filter((item) => item.transactionType == CategoryType.EXPENSE && item.paid == false && moment(item.dueDate).format() < moment().format()).map((item) => Number(item.amount))
-        
+
         setChartsData({
             revenue: revenueData.length > 1 ? revenueData : [0, 0],
             expense: expenseData.length > 1 ? expenseData : [0, 0],
@@ -178,17 +178,18 @@ export default function Home() {
                     <Text style={styles.subtitle}>{name}!</Text>
                 </View>
                 <View>
-                    <Image style={styles.profileImage}
-                        source={{ uri: 'https://images.pexels.com/photos/936229/pexels-photo-936229.jpeg?auto=compress&cs=tinysrgb&h=750&w=1260' }} />
+                    {/* <Image style={styles.profileImage}
+                        source={{}} /> */}
+                    <MaterialCommunityIcons style={styles.profileImage} name="face" size={45} color="black" />
                 </View>
             </View>
 
             <View style={styles.summaryContainer}>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                    <SummaryCard color={'#37b55a'} title={'Revenue'} chartsData={chartsData.revenue} value={summaryValue.revenue} />
-                    <SummaryCard color={'#4643d3'} title={'Expense'} chartsData={chartsData.expense} value={summaryValue.expense} />
-                    <SummaryCard color={'#f58218'} title={'Due'} chartsData={chartsData.due} value={summaryValue.due} />
-                    <SummaryCard color={'#ff344c'} title={'Over Due'} chartsData={chartsData.overDue} value={summaryValue.overDue} />
+                    <SummaryCard color={'#37b55a'} title={'Receita'} chartsData={chartsData.revenue} value={summaryValue.revenue} />
+                    <SummaryCard color={'#4643d3'} title={'Despesa'} chartsData={chartsData.expense} value={summaryValue.expense} />
+                    <SummaryCard color={'#f58218'} title={'À vencer'} chartsData={chartsData.due} value={summaryValue.due} />
+                    <SummaryCard color={'#ff344c'} title={'Vencido'} chartsData={chartsData.overDue} value={summaryValue.overDue} />
                 </ScrollView>
             </View>
 
@@ -196,7 +197,7 @@ export default function Home() {
                 colors={['#fefefe', '#efefef', '#fcfcfc']}
                 style={{ paddingBottom: 30 }}
             >
-                <Text style={styles.shortcutsContainerTitle}>Shortcuts</Text>
+                <Text style={styles.shortcutsContainerTitle}>Atalhos</Text>
                 <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -233,8 +234,8 @@ export default function Home() {
                     <View style={styles.slidingPanel}>
                         <View style={styles.slidingPanelBottom}></View>
                         <View style={styles.slidingPanelHeader}>
-                            <Text style={styles.slidingPanelHeaderTitle}>Transactions</Text>
-                            <Text style={styles.slidingPanelHeaderOptions}>All</Text>
+                            <Text style={styles.slidingPanelHeaderTitle}>Transações</Text>
+                            <Text style={styles.slidingPanelHeaderOptions}>Todas</Text>
                         </View>
                         <View style={styles.slidingPanelContent}>
                             {transactions ? (<>

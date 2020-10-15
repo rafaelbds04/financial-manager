@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import styles from './styles';
 import { View, Text, TouchableOpacity } from 'react-native';
-import Api from '../../services/api';
 
 import Logo from '../../assets/logo.svg';
 import SingInInput from '../../components/SingInInput';
@@ -54,14 +53,14 @@ export default function SingIn() {
                 })
             } else {
                 showMessage({
-                    message: 'Error during login',
+                    message: 'Falha ao entrar',
                     description: response.message,
                     type: 'danger'
                 })
             }
         } catch (error) {
             showMessage({
-                message: 'Error during login',
+                message: 'Falha ao entrar',
                 description: error,
                 type: 'danger'
             })
@@ -77,11 +76,11 @@ export default function SingIn() {
                 <SingInInput value={emailField} onChangeText={(t) => setEmailField(t)} placeholder='Email'
                     type='emailAddress' autoCapitalize='none'
                 />
-                <SingInInput value={passwordField} onChangeText={(t) => setPasswordField(t)} placeholder='Password'
+                <SingInInput value={passwordField} onChangeText={(t) => setPasswordField(t)} placeholder='Senha'
                     keyboardType='number-pad' type='password' isPassword={true} autoCapitalize='none' />
 
                 <TouchableOpacity style={styles.button} onPress={() => { handleLoginClick() }} >
-                    <Text style={styles.buttonText} >Login</Text>
+                    <Text style={styles.buttonText} >Entrar</Text>
                 </TouchableOpacity>
 
 

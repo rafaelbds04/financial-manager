@@ -5,6 +5,8 @@ import styles from './styles';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 interface CategorySelectorProps {
+    sectionName: string,
+
     defaultValue?: any,
     items: any,
     onChangeItem: (item: any, index: number) => void;
@@ -15,10 +17,10 @@ export interface CategorySelectorItem {
     value: string | number;
 }
 
-const CategorySelector: React.FC<CategorySelectorProps> = ({ items, defaultValue, onChangeItem }) => {
+const CategorySelector: React.FC<CategorySelectorProps> = ({ sectionName, items, defaultValue, onChangeItem }) => {
     return (
         <View style={styles.inputContainer} >
-            <Text style={styles.inputTitle} >Category</Text>
+            <Text style={styles.inputTitle} >{sectionName}</Text>
             <DropDownPicker
                 items={items}
                 defaultValue={defaultValue}

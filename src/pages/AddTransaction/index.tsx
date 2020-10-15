@@ -59,7 +59,7 @@ const AddTransaction = () => {
     const [dueDate, setDueDate] = useState(currentDate);
     const [selectedCategory, setSelectedCategory] = useState<string | number>('0');
     const [categoriesItems, setCategoriesItems] = useState<CategorySelectorItem[]>([
-        { label: 'Loading', value: '0' }
+        { label: 'Carregando', value: '0' }
     ]);
 
     useEffect(() => { (routeParams?.type == 'revenue') && setType(false) }, [])
@@ -174,7 +174,7 @@ const AddTransaction = () => {
         })))
 
         showMessage({
-            message: 'Sending your transaction!',
+            message: 'Enviando transação',
             type: "info",
             autoHide: false
         })
@@ -185,7 +185,7 @@ const AddTransaction = () => {
                 throw response.message
             }
             showMessage({
-                message: 'Transaction created success!',
+                message: 'Transação criada com sucesso!',
                 type: 'success'
             })
             navigation.reset({
@@ -200,47 +200,48 @@ const AddTransaction = () => {
     return (
         <View style={styles.container}>
 
-            < PageHeader title={'Add Transaction'} />
+            < PageHeader title={'Adicionar transação'} />
 
             <View style={styles.content} >
                 <ScrollView style={styles.body} showsVerticalScrollIndicator={false}  >
                     <View style={styles.inputContainer} >
-                        <Text style={styles.inputTitle} >Name</Text>
+                        <Text style={styles.inputTitle} >Nome</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Name"
+                            placeholder="Nome"
                             value={name}
                             onChangeText={(text) => setName(text)}
                         />
                     </View>
 
-                    <DualButton sectionName={'Type'} btn1Name={'Expense'}
-                        btn2Name={'Revenue'} value={type} onChange={setType} />
+                    <DualButton sectionName={'Tipo'} btn1Name={'Despesa'}
+                        btn2Name={'Receita'} value={type} onChange={setType} />
 
-                    <DualButton sectionName={'Paid'} btn1Name={'Paid'}
-                        btn2Name={'Not Paid'} value={paid} onChange={setPaid} />
+                    <DualButton sectionName={'Pagamento'} btn1Name={'Pago'}
+                        btn2Name={'Não pago'} value={paid} onChange={setPaid} />
 
                     <TransactionDatePicker paid={paid} date={date} onChange={setDate}
                         dueDate={dueDate} onChangeDue={setDueDate} />
 
                     <CategorySelector
+                        sectionName={'Categoria'}
                         items={categoriesItems}
                         defaultValue={selectedCategory}
                         onChangeItem={handleChangeCategory}
                     />
 
                     <View style={styles.inputContainer} >
-                        <Text style={styles.inputTitle}>Amount</Text>
+                        <Text style={styles.inputTitle}>Valor</Text>
                         <TextInputMask
                             type={'money'}
                             style={styles.input}
-                            placeholder="Amount"
+                            placeholder="Valor"
                             value={amount}
                             onChangeText={(text) => setAmount(text)}
                         />
                     </View>
 
-                    <Text style={styles.inputTitle} >Attachments</Text>
+                    <Text style={styles.inputTitle} >Anexos</Text>
                     <View style={styles.attachmentContainer} >
 
                         <TouchableOpacity
@@ -248,7 +249,7 @@ const AddTransaction = () => {
                             onPress={() => { handleAddAttachmentFromCamera() }}
                         >
                             <AntDesign name="camerao" size={24} color="black" />
-                            <Text style={styles.attachmentInputText} >From camera</Text>
+                            <Text style={styles.attachmentInputText} >Da camera</Text>
 
                         </TouchableOpacity>
 
@@ -257,7 +258,7 @@ const AddTransaction = () => {
                             onPress={() => { handleReadCodeFromReceipt() }}
                         >
                             <AntDesign name="scan1" size={24} color="black" />
-                            <Text style={styles.attachmentInputText} >Read recip code</Text>
+                            <Text style={styles.attachmentInputText} >Ler código NF</Text>
 
                         </TouchableOpacity>
                     </View>

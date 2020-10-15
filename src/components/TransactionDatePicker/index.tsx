@@ -35,7 +35,7 @@ const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({ paid, dat
     return (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
             <View style={[styles.inputContainer, { flex: 1 }]} >
-                <Text style={styles.inputTitle}>Date</Text>
+                <Text style={styles.inputTitle}>Data</Text>
                 <TouchableOpacity style={[styles.input, styles.dateInput]} onPress={() => setShow(true)}>
                     <Text style={{ fontSize: 15 }} >{moment(date).format('DD/MM/YYYY')}</Text>
                 </TouchableOpacity>
@@ -50,7 +50,7 @@ const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({ paid, dat
             </View>
 
             {!paid && (<View style={[styles.inputContainer, { flex: 1, marginLeft: 10 }]} >
-                <Text style={styles.inputTitle}>Due Date</Text>
+                <Text style={styles.inputTitle}>Vencimento</Text>
                 <TouchableOpacity style={[styles.input, styles.dateInput]} onPress={() => setDueShow(true)}>
                     <Text style={{ fontSize: 15 }} >{moment(dueDate).format('DD/MM/YYYY')}</Text>
                 </TouchableOpacity>

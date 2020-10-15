@@ -51,7 +51,7 @@ const AttacmentCamera: React.FC<AttacmentCameraProps> = () => {
         <>
             {!capturedImage ? (
                 <>
-                    < PageHeader title={'Add attacment from camera'} />
+                    < PageHeader title={'Adicionar anexo da câmera'} />
                     <View style={styles.contaier}>
                         <Camera style={{ flex: 1 }}
                             type={type}
@@ -68,7 +68,7 @@ const AttacmentCamera: React.FC<AttacmentCameraProps> = () => {
                                 <View style={styles.footer}>
                                     <TouchableOpacity style={styles.captureButton}
                                         onPress={() => { handleCapture() }} >
-                                        <Text style={styles.buttonText} >Capture</Text>
+                                        <Text style={styles.buttonText} >Capturar</Text>
                                     </TouchableOpacity>
                                 </View>
 
@@ -86,13 +86,13 @@ const AttacmentCamera: React.FC<AttacmentCameraProps> = () => {
                                 <TouchableOpacity style={styles.button}
                                     onPress={() => { setCapturedImage(null) }} >
                                     <Text style={[styles.buttonText,
-                                    { color: '#fff' }]} >Cancel</Text>
+                                    { color: '#fff' }]} >Cancelar</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={[styles.button,
                                 { backgroundColor: '#37b55a' }]}
                                     onPress={() => { handleAddAttacment() }} >
-                                    <Text style={styles.buttonText} >Add</Text>
+                                    <Text style={styles.buttonText} >Adiconar</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

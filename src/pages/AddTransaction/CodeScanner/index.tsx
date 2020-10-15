@@ -49,9 +49,9 @@ const CodeScanner: React.FC<CodeScannerProps> = () => {
     if (!(data.includes('fazenda.rj.gov.br'))) {
       showMessage({
         type: "danger",
-        message: 'Invalid receipt',
-        description: 'This code is not accepted.',
-        duration: 4000
+        message: 'NF inválida',
+        description: 'Esse código não é aceito.',
+        duration: 5000
       })
       handleReturnToTransaction();
       return
@@ -60,7 +60,7 @@ const CodeScanner: React.FC<CodeScannerProps> = () => {
     //Sending receipt code to server
     try {
       showMessage({
-        message: 'Cathing a receipt',
+        message: 'Pegando NF',
         type: "info",
         autoHide: false
       })
@@ -77,7 +77,7 @@ const CodeScanner: React.FC<CodeScannerProps> = () => {
         return
       }
       showMessage({
-        message: 'Receipt caught as success',
+        message: 'NF obtida com sucesso!',
         type: 'success'
       })
       handleReturnToTransaction(response);
@@ -103,7 +103,7 @@ const CodeScanner: React.FC<CodeScannerProps> = () => {
 
   return (
     <>
-      < PageHeader title={'Scan receipt code'} />
+      < PageHeader title={'Digitalize o código da NF'} />
       <View style={styles.contaier}>
         <BarCodeScanner onBarCodeScanned={handleBarCodeScanned} style={{ flex: 1 }}>
           <View style={styles.scanContainer}>
