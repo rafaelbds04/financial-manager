@@ -1,7 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { AppLoading } from 'expo';
-import { SafeAreaView, Text, View } from 'react-native';
 
 import UserProvider from './src/contexts/UserContext';
 
@@ -17,6 +15,7 @@ import UserProvider from './src/contexts/UserContext';
 import { Roboto_400Regular, Roboto_300Light, Roboto_500Medium, Roboto_700Bold, useFonts } from '@expo-google-fonts/roboto';
 import Routes from './src/routes';
 import FlashMessage from 'react-native-flash-message';
+import AppLoading from './src/components/AppLoading';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -24,7 +23,7 @@ export default function App() {
   })
 
   if (!fontsLoaded) {
-    return <AppLoading />
+    return (<AppLoading /> )
   }
 
   return (
