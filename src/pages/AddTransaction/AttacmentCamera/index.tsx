@@ -37,7 +37,7 @@ const AttacmentCamera: React.FC<AttacmentCameraProps> = () => {
     async function handleCapture() {
         if (cameraRef) {
             const data = await cameraRef.current?.takePictureAsync({
-                quality: 0.8,
+                quality: 0.4,
                 base64: true
             })
             setCapturedImage(data?.uri)

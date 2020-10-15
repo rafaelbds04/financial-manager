@@ -6,7 +6,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 interface CategorySelectorProps {
     sectionName: string,
-
     defaultValue?: any,
     items: any,
     onChangeItem: (item: any, index: number) => void;

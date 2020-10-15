@@ -155,7 +155,7 @@ const AddTransaction = () => {
                 message: 'Error',
                 description: validate.message,
                 type: 'danger',
-                duration: 4000
+                duration: 5000
             })
             return
         }
@@ -296,12 +296,12 @@ const AddTransaction = () => {
 
                 <View style={styles.footer}>
                     <TouchableOpacity style={styles.button} onPress={() => { handleBack() }} >
-                        <Text style={[styles.buttonText, { color: '#a8a4d3' }]} >Cancel</Text>
+                        <Text style={[styles.buttonText, { color: '#a8a4d3' }]} >Cancelar</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={[styles.button,
                     { backgroundColor: '#4643d3' }]} onPress={() => { handleAddTransaction() }} >
-                        <Text style={styles.buttonText} >Add</Text>
+                        <Text style={styles.buttonText} >Adicionar</Text>
                     </TouchableOpacity>
                 </View>
 

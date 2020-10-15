@@ -4,7 +4,7 @@ import { showMessage } from "react-native-flash-message"
 const catchErrorMessage = (message: string) => {
     showMessage({
         type: "danger",
-        message: 'An error has occurred',
+        message: 'Ocorreu um erro',
         description: message,
         duration: 5000
     })
