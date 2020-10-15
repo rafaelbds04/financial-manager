@@ -21,7 +21,7 @@ import styles from './styles';
 
 interface Params {
     attachmentImage?: string;
-    receipt?: Receipt;
+    receiptScan?: { scannedAt?: string, code?: string }
     type?: string;
 }
 
@@ -57,6 +57,8 @@ const AddTransaction = () => {
     const [type, setType] = useState(true);
     const [date, setDate] = useState(currentDate);
     const [dueDate, setDueDate] = useState(currentDate);
+    const [blockActions, setBlockActions] = useState(false);
+    const [receiptKey, setReceiptKey] = useState<string | undefined>();
     const [selectedCategory, setSelectedCategory] = useState<string | number>('0');
     const [categoriesItems, setCategoriesItems] = useState<CategorySelectorItem[]>([
         { label: 'Carregando', value: '0' }
@@ -87,6 +89,13 @@ const AddTransaction = () => {
         })();
     }, [type]);
 
+    //Every time when scans and go back to the screen called the function to fetch a receipt.
+    useEffect(() => {
+        (async () => {
+            routeParams?.receiptScan?.code && await catchReceipt(routeParams?.receiptScan.code);
+        })()
+    }, [routeParams?.receiptScan])
+
     useEffect(() => {
         const images: IImageInfo[] = []
         if (routeParams?.attachmentImage) {
@@ -96,26 +105,27 @@ const AddTransaction = () => {
             })
         }
 
-        if (routeParams?.receipt) {
-            autoFillFromReceipt(routeParams?.receipt);
-            if (!routeParams?.receipt?.attachment?.key) return
-            const imageUri = routeParams?.receipt?.attachment?.url;
+        if (receiptAttachment?.key) {
+            const imageUri = receiptAttachment?.url;
             imageUri && images.push({ url: imageUri });
         }
 
         setAttachmentsImages(images);
-    }, [routeParams?.attachmentImage, routeParams?.receipt]);
+    }, [routeParams?.attachmentImage, receiptAttachment?.key]);
 
 
     function handleBack() {
+        if(blockActions) return
         navigation.goBack();
     }
 
     function handleAddAttachmentFromCamera() {
+        if(blockActions) return
         navigation.navigate('AttacmentCamera');
     }
 
     function handleReadCodeFromReceipt() {
+        if(blockActions) return
         navigation.navigate('CodeScanner');
     }
 
@@ -123,8 +133,45 @@ const AddTransaction = () => {
         setSelectedCategory(item.value);
     }
 
+    async function catchReceipt(data: string) {
+        try {
+            showMessage({
+                message: 'Pegando NF',
+                description: 'Por favor aguarde',
+                type: "info",
+                hideOnPress: false,
+                autoHide: false
+            })
+            setBlockActions(true);
+            const { response, statusCode } = await api.getReceipt(data);
+            if (statusCode === 401) return unauthorized(navigation);
+
+            setBlockActions(false);
+            //If was error, show message and return to last screen
+            if (response.error || statusCode !== 200) {
+                const errorMsg = response.error || response.message;
+                catchErrorMessage(errorMsg!);
+
+                response.totalAmount && autoFillFromReceipt(
+                    { totalAmount: response.totalAmount })
+                return
+            }
+
+            showMessage({
+                message: 'NF obtida com sucesso!',
+                type: 'success'
+            })
+            autoFillFromReceipt(response);
+
+        } catch (error) {
+            setBlockActions(false);
+            catchErrorMessage(error);
+            return
+        }
+    }
+
     function autoFillFromReceipt(data: Receipt) {
-        const { emitter, emittedDate, totalAmount, attachment } = data;
+        const { emitter, emittedDate, totalAmount, attachment, receiptKey } = data;
         emitter && setName(emitter);
         totalAmount && setAmount(accounting.formatMoney(Number(data.totalAmount), {
             decimal: ',',
@@ -134,10 +181,11 @@ const AddTransaction = () => {
         }).toString());
         emittedDate && setDate(new Date(emittedDate));
         attachment && setReceiptAttachment(attachment);
-
+        receiptKey && setReceiptKey(receiptKey);
     }
 
     async function handleAddTransaction() {
+        if(blockActions) return
         const transactionInfos = {
             name,
             transactionType: type ? 'expense' : 'revenue',
@@ -163,9 +211,11 @@ const AddTransaction = () => {
 
         //Serialize obj to formdata
         const formData: FormData = serialize(transactionInfos)
-        //if exist receipt send with form
+
+        //Check exist receipt attachment and receiptKey to add form data.
         receiptAttachment?.id && formData
             .append('receiptAttachment', receiptAttachment?.id.toString())
+        receiptKey && formData.append('receiptKey', receiptKey)     
 
         //if exist attachment send with form
         capturedAttachment && formData.append('files', JSON.parse(JSON.stringify({
@@ -184,7 +234,7 @@ const AddTransaction = () => {
             const response = await api.addTransaction(formData);
             if (response.statusCode === 401) return unauthorized(navigation);
             if (response.statusCode != 201) {
-                throw response.message
+                throw response
             }
             showMessage({
                 message: 'Transação criada com sucesso!',

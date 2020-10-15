@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Vibration } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Vibration } from 'react-native';
 import styles from './styles';
 
 import { BarCodeEvent, BarCodeScanner } from 'expo-barcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 import PageHeader from '../../../components/PageHeader';
-import api from '../../../services/api';
 import { showMessage } from "react-native-flash-message";
-import { catchErrorMessage, unauthorized } from '../../../services/utils';
+import moment from 'moment';
 
 interface CodeScannerProps {
   toggleScannerVisible?: Function
@@ -24,7 +23,8 @@ export interface Receipt {
   totalAmount?: number
   emittedDate?: string
   error?: string,
-  attachment?: Attacment
+  attachment?: Attacment,
+  receiptKey?: string
 }
 
 const CodeScanner: React.FC<CodeScannerProps> = () => {
@@ -56,43 +56,12 @@ const CodeScanner: React.FC<CodeScannerProps> = () => {
       handleReturnToTransaction();
       return
     }
-
-    //Sending receipt code to server
-    try {
-      showMessage({
-        message: 'Pegando NF',
-        type: "info",
-        autoHide: false
-      })
-      const { response, statusCode } = await api.getReceipt(data);
-      if(statusCode === 401) return unauthorized(navigation);
-      
-      //If was error, show message and return to last screen
-      if (response.error || statusCode !== 200) {
-        const errorMsg = response.error || response.message;
-        catchErrorMessage(errorMsg!);
-
-        response.totalAmount ? handleReturnToTransaction(
-          { totalAmount: response.totalAmount })
-          : handleReturnToTransaction();
-        return
-      }
-      showMessage({
-        message: 'NF obtida com sucesso!',
-        type: 'success'
-      })
-      handleReturnToTransaction(response);
-
-    } catch (error) {
-      catchErrorMessage(error);
-      handleReturnToTransaction();
-      return
-    }
+    handleReturnToTransaction({ scannedAt: moment().toISOString(), code: data });
   };
 
 
-  async function handleReturnToTransaction(receipt?: Receipt) {
-    navigation.navigate('AddTransaction', { receipt })
+  async function handleReturnToTransaction(receiptCode?: { scannedAt?: string, code?: string }) {
+    navigation.navigate('AddTransaction', { receiptScan: receiptCode })
   }
 
   if (hasPermission === null) {

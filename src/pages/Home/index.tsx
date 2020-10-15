@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, Dimensions, Animated, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Dimensions, Animated, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -15,7 +15,6 @@ import TransactionCardShimmer from '../../components/TransactionCardShimmer';
 import SummaryCard from '../../components/SummaryCard';
 
 import styles from './styles';
-import { showMessage } from 'react-native-flash-message';
 /**
  * Colors
  * primary #4643d3
@@ -243,7 +242,7 @@ export default function Home() {
                             {transactions ? (<>
                                 <FlatList
                                     data={transactions?.slice(0, 10)}
-                                    showsHorizontalScrollIndicator={false}
+                                    showsVerticalScrollIndicator={false}
                                     keyExtractor={(item) => item.id.toString()}
                                     renderItem={({ item }) => {
                                         return (

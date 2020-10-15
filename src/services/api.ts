@@ -42,8 +42,8 @@ interface RemoteCategory extends Error {
     response: Category[]
 }
 // const BASE_API = 'http://127.0.0.1:3000';
-// const BASE_API = 'http://192.168.1.100:3000'; 
-const BASE_API = 'https://financeapi.diskquentinha.com.br';
+const BASE_API = 'http://192.168.1.100:3000'; 
+// const BASE_API = 'https://financeapi.diskquentinha.com.br';
 
 interface ReceiptResponse {
     response: {
@@ -52,7 +52,8 @@ interface ReceiptResponse {
         emittedDate?: string
         error?: string,
         attachment?: Attacment,
-        message?: string
+        message?: string,
+        receiptKey?: string
     }
     statusCode?: number,
 }

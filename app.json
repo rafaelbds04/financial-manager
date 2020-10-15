@@ -20,7 +20,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "br.com.diskquentinha.finance",
+      "package": "br.com.diskquentinha.DiskFinance",
       "versionCode": 1
     },
     "web": {
