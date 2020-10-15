@@ -15,7 +15,7 @@ import { IImageInfo } from 'react-native-image-zoom-viewer/built/image-viewer.ty
 import DualButton from '../../components/DualButton';
 import { serialize } from 'object-to-formdata';
 import validators from '../../services/validators';
-import { catchErrorMessage } from '../../services/utils';
+import { catchErrorMessage, unauthorized } from '../../services/utils';
 import accounting from 'accounting';
 import styles from './styles';
 
@@ -68,7 +68,8 @@ const AddTransaction = () => {
         (async () => {
             try {
                 const categoryType = type ? CategoryType.EXPENSE : CategoryType.REVENUE
-                const response = await api.getCategoriesByType(categoryType);
+                const { response, statusCode } = await api.getCategoriesByType(categoryType);
+                if (statusCode === 401) return unauthorized(navigation);
                 if (!response.length) return
                 const data = response.map((item: Category) => {
                     const data = {
@@ -181,6 +182,7 @@ const AddTransaction = () => {
 
         try {
             const response = await api.addTransaction(formData);
+            if (response.statusCode === 401) return unauthorized(navigation);
             if (response.statusCode != 201) {
                 throw response.message
             }

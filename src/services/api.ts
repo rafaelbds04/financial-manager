@@ -37,6 +37,10 @@ interface RemoteTransactions extends Error {
         category: Category
     }[]
 }
+
+interface RemoteCategory extends Error {
+    response: Category[]
+}
 // const BASE_API = 'http://127.0.0.1:3000';
 // const BASE_API = 'http://192.168.1.100:3000'; 
 const BASE_API = 'https://financeapi.diskquentinha.com.br';
@@ -89,7 +93,7 @@ export default {
             throw error.message
         }
     },
-    getCategoriesByType: async (type: CategoryType): Promise<Category[]> => {
+    getCategoriesByType: async (type: CategoryType): Promise<RemoteCategory> => {
         const config = await AsyncStorage.getItem('appConfig');
         const { token } = config && JSON.parse(config);
 
@@ -102,8 +106,8 @@ export default {
                     'cookie': `${token}`
                 }
             })
-            const resp = await req.json();
-            return resp;
+            const response = await req.json();
+            return { response, statusCode: req.status };
         } catch (error) {
             throw 'Catching categories ' + error.message
         }

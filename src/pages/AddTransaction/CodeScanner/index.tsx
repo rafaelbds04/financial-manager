@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import PageHeader from '../../../components/PageHeader';
 import api from '../../../services/api';
 import { showMessage } from "react-native-flash-message";
-import { catchErrorMessage } from '../../../services/utils';
+import { catchErrorMessage, unauthorized } from '../../../services/utils';
 
 interface CodeScannerProps {
   toggleScannerVisible?: Function
@@ -65,7 +65,8 @@ const CodeScanner: React.FC<CodeScannerProps> = () => {
         autoHide: false
       })
       const { response, statusCode } = await api.getReceipt(data);
-
+      if(statusCode === 401) return unauthorized(navigation);
+      
       //If was error, show message and return to last screen
       if (response.error || statusCode !== 200) {
         const errorMsg = response.error || response.message;

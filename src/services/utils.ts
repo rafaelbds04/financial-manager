@@ -1,3 +1,4 @@
+import { NavigationProp, ParamListBase } from "@react-navigation/native"
 import moment from "moment"
 import { showMessage } from "react-native-flash-message"
 
@@ -9,6 +10,20 @@ const catchErrorMessage = (message: string) => {
         duration: 5000
     })
 }
+
+const unauthorized = (navigation: NavigationProp<ParamListBase>) => {
+    navigation.reset({
+        routes: [{ name: 'Preload' }]
+    })
+
+    showMessage({
+        type: "danger",
+        message: 'Ocorreu um erro',
+        description: 'Acesso não autorizado',
+        duration: 5000
+    })
+}
+
 const setMomentLocale = () => {
     moment.defineLocale('pt-br', {
         months: 'janeiro_fevereiro_março_abril_maio_junho_julho_agosto_setembro_outubro_novembro_dezembro'.split('_'),
@@ -19,4 +34,4 @@ const setMomentLocale = () => {
     })
 }
 
-export { catchErrorMessage, setMomentLocale }
+export { catchErrorMessage, setMomentLocale, unauthorized }

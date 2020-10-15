@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { showMessage } from 'react-native-flash-message';
 import { UserContext } from '../../contexts/UserContext';
+import validators from '../../services/validators';
 
 export default function SingIn() {
     const { dispatch }: any = useContext(UserContext);
@@ -28,7 +29,16 @@ export default function SingIn() {
 
 
     const handleLoginClick = async () => {
-        if (!(emailField && passwordField)) return alert('Fill the fields')
+        const validate = await validators.validateSingIn({ emailField, passwordField })
+        if (validate != true) {
+            showMessage({
+                message: 'Error',
+                description: validate.message,
+                type: 'danger',
+                duration: 5000
+            })
+            return
+        }
 
         try {
             const response = await api.singIn(emailField, passwordField);
@@ -77,7 +87,8 @@ export default function SingIn() {
                     type='emailAddress' autoCapitalize='none'
                 />
                 <SingInInput value={passwordField} onChangeText={(t) => setPasswordField(t)} placeholder='Senha'
-                    keyboardType='number-pad' type='password' isPassword={true} autoCapitalize='none' />
+                    keyboardType='number-pad' type='password' isPassword={true} autoCapitalize='none'
+                    onSubmitEditing={handleLoginClick} />
 
                 <TouchableOpacity style={styles.button} onPress={() => { handleLoginClick() }} >
                     <Text style={styles.buttonText} >Entrar</Text>

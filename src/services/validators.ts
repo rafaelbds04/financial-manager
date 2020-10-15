@@ -13,5 +13,12 @@ export default {
                 category: string().required()
             }).validate(toValidate).then(() => true).catch(error => error);
             return result;
-    }
+    },
+    async validateSingIn(toValidate: object) {
+        const result = await object().shape({
+            emailField: string().required(),
+            passwordField: string().required(),
+        }).validate(toValidate).then(() => true).catch(error => error);
+        return result;
+}
 }

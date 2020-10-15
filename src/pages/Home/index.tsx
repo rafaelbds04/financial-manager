@@ -6,7 +6,7 @@ import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import SlidingUpPanel from 'rn-sliding-up-panel';
 import api from '../../services/api';
-import { catchErrorMessage } from '../../services/utils';
+import { catchErrorMessage, unauthorized } from '../../services/utils';
 import { UserContext } from '../../contexts/UserContext';
 import moment from 'moment';
 import { Category, CategoryType } from '../AddTransaction';
@@ -15,6 +15,7 @@ import TransactionCardShimmer from '../../components/TransactionCardShimmer';
 import SummaryCard from '../../components/SummaryCard';
 
 import styles from './styles';
+import { showMessage } from 'react-native-flash-message';
 /**
  * Colors
  * primary #4643d3
@@ -143,6 +144,7 @@ export default function Home() {
     async function fetchLastTransactions() {
         try {
             const response = await api.getLastTransactions();
+            if(response.statusCode === 401) return unauthorized(navigation);
             if (response.error) throw response.message
             //Sorting by date
             const data = response.data.sort((a, b) => {

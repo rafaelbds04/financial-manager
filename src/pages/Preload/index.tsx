@@ -34,8 +34,8 @@ export default function Preload() {
                         });
 
                         showMessage({
-                            message: 'Welcome back!',
-                            description: 'Logged in success.',
+                            message: 'Bem vindo de volta!',
+                            description: 'Logado com sucesso.',
                             type: "success",
                             duration: 2300
                         })
