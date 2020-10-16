@@ -168,11 +168,11 @@ export default {
             throw error
         }
     },
-    getLastTransactions: async (): Promise<RemoteTransactions> => {
+    getLastTransactions: async (skip: number = 0, take: number = 10,): Promise<RemoteTransactions> => {
         try {
             const config = await AsyncStorage.getItem('appConfig');
             const { token } = config && JSON.parse(config);
-            const req = await fetch(`${BASE_API}/transactions/`, {
+            const req = await fetch(`${BASE_API}/transactions/?take=${take}&skip=${skip}`, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',
@@ -182,7 +182,7 @@ export default {
             const response = await req.json();
             return { data: response, statusCode: req.status };
         } catch (error) {
-            throw error.message
+            throw error
         }
     }
 

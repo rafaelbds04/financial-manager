@@ -69,7 +69,7 @@ export default function Home() {
         due: [], expense: [], overDue: [], revenue: []
     })
 
-    const [transactions, setTransactions] = useState<Transactions[] | null>();
+    const [transactions, setTransactions] = useState<Transactions[] | undefined>();
 
     const [dragRange, setDragRange] = useState({
         top: height - 105,
@@ -144,16 +144,11 @@ export default function Home() {
         try {
             const response = await api.getLastTransactions();
             if (response.statusCode === 401) return unauthorized(navigation);
-            if (response.error) throw response.message
-            //Sorting by date
-            const data = response.data.sort((a, b) => {
-                return Number(moment(b.transactionDate)) - Number(moment(a.transactionDate))
-            })
-
-            setTransactions(data);
-            mountCharts(data);
+            if (response.error) throw response
+            setTransactions(response.data);
+            mountCharts(response.data);
         } catch (error) {
-            catchErrorMessage(error);
+            catchErrorMessage(error?.message);
         }
     }
 
