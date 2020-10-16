@@ -143,7 +143,7 @@ export default function Home() {
     async function fetchLastTransactions() {
         try {
             const response = await api.getLastTransactions();
-            if(response.statusCode === 401) return unauthorized(navigation);
+            if (response.statusCode === 401) return unauthorized(navigation);
             if (response.error) throw response.message
             //Sorting by date
             const data = response.data.sort((a, b) => {
@@ -249,10 +249,7 @@ export default function Home() {
                                             <TransactionCard data={item} />
                                         );
                                     }} /></>) : (<>
-                                        <TransactionCardShimmer />
-                                        <TransactionCardShimmer />
-                                        <TransactionCardShimmer />
-                                        <TransactionCardShimmer />
+                                        <TransactionCardShimmer repetitions={4} />
                                     </>)}
                         </View>
                     </View>
