@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './styles';
-import { View, Text, TouchableOpacity, ScrollView, FlatList, Image, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Modal } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -10,6 +10,7 @@ import api from '../../services/api';
 import { catchErrorMessage, unauthorized } from '../../services/utils';
 import { formatMoney } from 'accounting';
 import moment from 'moment';
+import { showMessage } from 'react-native-flash-message';
 
 interface Params {
     transactionId: number
@@ -56,6 +57,36 @@ export default function TransactionDetail() {
         })()
     }, [])
 
+
+    async function handleRemoveTransaction() {
+        if (transaction?.id) {
+            try {
+                const { statusCode } = await api.deleteTransaction(transaction?.id)
+                if (statusCode === 200) {
+                    showMessage({
+                        message: 'Transação deletada com sucesso!',
+                        description: `${transaction?.id} - deletada`,
+                        type: 'success'
+                    })
+                    navigation.reset({
+                        routes: [{ name: 'Home' }]
+                    })
+                    return
+                }
+                catchErrorMessage('Ocorreu um erro ao deletar transação.')
+            } catch (error) {
+                catchErrorMessage(error?.message)
+            }
+        }
+    }
+
+    function handleConfirmDelete() {
+        Alert.alert('Confirmar remoção',
+            'Você tem certeza que deseja apagar essa transação?', [
+            { text: 'Apagar transação', onPress: () => { handleRemoveTransaction() } },
+            { text: 'Voltar' }
+        ])
+    }
 
     function handleBack() {
         navigation.goBack();
@@ -151,8 +182,8 @@ export default function TransactionDetail() {
                     { backgroundColor: '#6664d4' }]} onPress={() => { }} >
                         <Text style={styles.buttonText} >Editar</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => { }} >
-                        <Text style={[styles.buttonText, { color: '#fff' }]} >Remover</Text>
+                    <TouchableOpacity style={styles.button} onPress={() => { handleConfirmDelete() }} >
+                        <Text style={[styles.buttonText, { color: '#fff' }]} >Apagar</Text>
                     </TouchableOpacity>
                 </View>
             </View>

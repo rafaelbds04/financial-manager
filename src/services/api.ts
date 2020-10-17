@@ -91,7 +91,7 @@ export default {
                 },
                 body: JSON.stringify({ email, password })
             })
-            const token = req.headers.get('Set-Hedaer');
+            const token = req.headers.get('Set-Header');
             const resp = (typeof req === 'object') ? await req.json() : req
             // const resp = await req.json();
             return { ...resp, token };
@@ -210,6 +210,22 @@ export default {
             // const response = await req.json();
             const response = (typeof req === 'object') ? await req.json() : req
             return { ...response, statusCode: req.status };
+        } catch (error) {
+            throw error
+        }
+    },
+    deleteTransaction: async (id: number): Promise<Error> => {
+        try {
+            const config = await AsyncStorage.getItem('appConfig');
+            const { token } = config && JSON.parse(config);
+            const req = await fetch(`${BASE_API}/transactions/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json',
+                    'cookie': `${token}`
+                },
+            })
+            return { statusCode: req.status };
         } catch (error) {
             throw error
         }
