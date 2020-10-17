@@ -8,15 +8,33 @@ import { useNavigation } from '@react-navigation/native';
 import { showMessage } from 'react-native-flash-message';
 import api from '../../services/api';
 import { catchErrorMessage, setMomentLocale } from '../../services/utils';
+import * as Updates from 'expo-updates';
 
 export default function Preload() {
     const { dispatch }: any = useContext(UserContext);
     const navigation = useNavigation();
 
+    async function checkUpdate() {
+        try {
+            const update = await Updates.checkForUpdateAsync();
+            if (update.isAvailable) {
+              await Updates.fetchUpdateAsync();
+              showMessage({
+                message: 'Atualização disponível!',
+                description: 'Aguarde enquanto estamos atualizado o seu APP.',
+                type: "warning",
+                autoHide: false
+            })
+              await Updates.reloadAsync();
+            }
+          } catch (error) {
+            catchErrorMessage(error?.message);
+          }
+    }
+
     useEffect(() => {
         setMomentLocale();
         const checkToken = async () => {
-
             const config = await AsyncStorage.getItem('appConfig')
             const { token } = config ? JSON.parse(config) : '';
 
@@ -56,11 +74,12 @@ export default function Preload() {
                     })
                 }
             } catch (error) {
-                catchErrorMessage(error);
+                catchErrorMessage(error?.message);
             }
 
         }
         checkToken();
+        checkUpdate();
     }, []);
 
     return (
