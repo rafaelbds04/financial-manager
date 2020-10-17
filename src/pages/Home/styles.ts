@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
         color: '#fff'
     },
     slidingPanelContent: {
-        padding: 20
-    }
+        padding: 20,
+    },
 });
 
 export default styles;

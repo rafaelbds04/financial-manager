@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-community/async-storage";
 import { Category, CategoryType } from "../pages/AddTransaction";
 import { Attacment } from '../pages/AddTransaction/CodeScanner/index';
+import { FullTransaction } from "../pages/TransactionDetail";
 /*
   url: {
     ios: localhost
@@ -38,12 +39,14 @@ interface RemoteTransactions extends Error {
     }[]
 }
 
+interface RemoteFullTransactions extends FullTransaction, Error { }
+
 interface RemoteCategory extends Error {
     response: Category[]
 }
 // const BASE_API = 'http://127.0.0.1:3000';
-const BASE_API = 'http://192.168.1.100:3000'; 
-// const BASE_API = 'https://financeapi.diskquentinha.com.br';
+// const BASE_API = 'http://192.168.1.100:3000';
+const BASE_API = 'https://financeapi.diskquentinha.com.br';
 
 interface ReceiptResponse {
     response: {
@@ -71,7 +74,8 @@ export default {
                     'cookie': `${token}`
                 }
             })
-            const resp = await req.json();
+            const resp = (typeof req === 'object') ? await req.json() : req
+            // const resp = await req.json();
             return { ...resp, status: req.status };
         } catch (error) {
             throw error.message
@@ -88,7 +92,8 @@ export default {
                 body: JSON.stringify({ email, password })
             })
             const token = req.headers.get('Set-Hedaer');
-            const resp = await req.json();
+            const resp = (typeof req === 'object') ? await req.json() : req
+            // const resp = await req.json();
             return { ...resp, token };
         } catch (error) {
             throw error.message
@@ -107,7 +112,9 @@ export default {
                     'cookie': `${token}`
                 }
             })
-            const response = await req.json();
+            // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
+
             return { response, statusCode: req.status };
         } catch (error) {
             throw 'Catching categories ' + error.message
@@ -126,7 +133,8 @@ export default {
                     'cookie': `${token}`
                 }
             })
-            const response = await req.json();
+            // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
             return { response, statusCode: req.status };
         } catch (error) {
             throw 'Receipt ' + error.message
@@ -145,7 +153,8 @@ export default {
                 },
                 body: transactionFormData
             })
-            const response = await req.json();
+            // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
             return { ...response, statusCode: req.status };
         } catch (error) {
             throw error
@@ -162,7 +171,8 @@ export default {
                     'cookie': `${token}`
                 },
             })
-            const response = await req.json();
+            // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
             return { ...response, statusCode: req.status };
         } catch (error) {
             throw error
@@ -179,8 +189,27 @@ export default {
                     'cookie': `${token}`
                 },
             })
-            const response = await req.json();
+            // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
             return { data: response, statusCode: req.status };
+        } catch (error) {
+            throw error
+        }
+    },
+    getTransaction: async (id: number): Promise<RemoteFullTransactions> => {
+        try {
+            const config = await AsyncStorage.getItem('appConfig');
+            const { token } = config && JSON.parse(config);
+            const req = await fetch(`${BASE_API}/transactions/${id}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'cookie': `${token}`
+                },
+            })
+            // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
+            return { ...response, statusCode: req.status };
         } catch (error) {
             throw error
         }

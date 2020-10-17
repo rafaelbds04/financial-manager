@@ -101,6 +101,12 @@ export default function Home() {
         //     key: '3'
         // },
         {
+            name: 'Extrato \n',
+            action: 'AddTransaction',
+            icon: 'barschart',
+            key: '3'
+        },
+        {
             name: 'Contas \n',
             action: 'AddTransaction',
             icon: 'creditcard',
@@ -142,7 +148,7 @@ export default function Home() {
 
     async function fetchLastTransactions() {
         try {
-            const response = await api.getLastTransactions();
+            const response = await api.getLastTransactions(0, 20);
             if (response.statusCode === 401) return unauthorized(navigation);
             if (response.error) throw response
             setTransactions(response.data);
@@ -236,12 +242,14 @@ export default function Home() {
                         <View style={styles.slidingPanelContent}>
                             {transactions ? (<>
                                 <FlatList
-                                    data={transactions?.slice(0, 10)}
+                                    data={transactions?.slice(0, 9)}
                                     showsVerticalScrollIndicator={false}
                                     keyExtractor={(item) => item.id.toString()}
                                     renderItem={({ item }) => {
                                         return (
-                                            <TransactionCard data={item} />
+                                            <TransactionCard data={item}
+                                                onPress={() => handleNavigateTo('TransactionDetail',
+                                                    { transactionId: item.id })} />
                                         );
                                     }} /></>) : (<>
                                         <TransactionCardShimmer repetitions={4} />
