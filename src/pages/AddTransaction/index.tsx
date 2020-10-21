@@ -18,6 +18,8 @@ import validators from '../../services/validators';
 import { catchErrorMessage, unauthorized } from '../../services/utils';
 import accounting from 'accounting';
 import styles from './styles';
+import CurrencyInput from '../../components/CurrencyInput';
+import SingInInput from '../../components/SingInInput';
 
 interface Params {
     attachmentImage?: string;
@@ -64,9 +66,11 @@ const AddTransaction = () => {
         { label: 'Carregando', value: '0' }
     ]);
 
+    //On mount, component get params and set transaction type
     useEffect(() => { (routeParams?.type == 'revenue') && setType(false) }, [])
 
     useEffect(() => {
+        //Listen to switch category type
         (async () => {
             try {
                 const categoryType = type ? CategoryType.EXPENSE : CategoryType.REVENUE
@@ -96,6 +100,7 @@ const AddTransaction = () => {
         })()
     }, [routeParams?.receiptScan])
 
+    //Checking images changes
     useEffect(() => {
         const images: IImageInfo[] = []
         if (routeParams?.attachmentImage) {
@@ -115,17 +120,17 @@ const AddTransaction = () => {
 
 
     function handleBack() {
-        if(blockActions) return
+        if (blockActions) return
         navigation.goBack();
     }
 
     function handleAddAttachmentFromCamera() {
-        if(blockActions) return
+        if (blockActions) return
         navigation.navigate('AttacmentCamera');
     }
 
     function handleReadCodeFromReceipt() {
-        if(blockActions) return
+        if (blockActions) return
         navigation.navigate('CodeScanner');
     }
 
@@ -147,7 +152,6 @@ const AddTransaction = () => {
             if (statusCode === 401) return unauthorized(navigation);
 
             setBlockActions(false);
-            //If was error, show message and return to last screen
             if (response.error || statusCode !== 200) {
                 const errorMsg = response.error || response.message;
                 catchErrorMessage(errorMsg!);
@@ -185,7 +189,8 @@ const AddTransaction = () => {
     }
 
     async function handleAddTransaction() {
-        if(blockActions) return
+        if (blockActions) return
+        setBlockActions(true)
         const transactionInfos = {
             name,
             transactionType: type ? 'expense' : 'revenue',
@@ -200,6 +205,7 @@ const AddTransaction = () => {
 
         const validate = await validators.validateTransactionCreate(transactionInfos);
         if (validate != true) {
+            setBlockActions(false)
             showMessage({
                 message: 'Error',
                 description: validate.message,
@@ -215,7 +221,7 @@ const AddTransaction = () => {
         //Check exist receipt attachment and receiptKey to add form data.
         receiptAttachment?.id && formData
             .append('receiptAttachment', receiptAttachment?.id.toString())
-        receiptKey && formData.append('receiptKey', receiptKey)     
+        receiptKey && formData.append('receiptKey', receiptKey)
 
         //if exist attachment send with form
         capturedAttachment && formData.append('files', JSON.parse(JSON.stringify({
@@ -234,6 +240,7 @@ const AddTransaction = () => {
             const response = await api.addTransaction(formData);
             if (response.statusCode === 401) return unauthorized(navigation);
             if (response.statusCode != 201) {
+                setBlockActions(false)
                 throw response
             }
             showMessage({
@@ -243,7 +250,9 @@ const AddTransaction = () => {
             navigation.reset({
                 routes: [{ name: 'Home' }]
             })
+            setBlockActions(false)
         } catch (error) {
+            setBlockActions(false)
             catchErrorMessage(error?.message);
         }
 
@@ -282,16 +291,7 @@ const AddTransaction = () => {
                         onChangeItem={handleChangeCategory}
                     />
 
-                    <View style={styles.inputContainer} >
-                        <Text style={styles.inputTitle}>Valor</Text>
-                        <TextInputMask
-                            type={'money'}
-                            style={styles.input}
-                            placeholder="Valor"
-                            value={amount}
-                            onChangeText={(text) => setAmount(text)}
-                        />
-                    </View>
+                    <CurrencyInput onChangeAmount={setAmount} value={amount} />
 
                     <Text style={styles.inputTitle} >Anexos</Text>
                     <View style={styles.attachmentContainer} >
