@@ -88,6 +88,10 @@ export default function TransactionDetail() {
         ])
     }
 
+    function handleEdit() {
+        navigation.navigate('EditTransaction', { transactionId: routeParams.transactionId })
+    }
+
     function handleBack() {
         navigation.goBack();
     }
@@ -179,7 +183,7 @@ export default function TransactionDetail() {
                 </ScrollView>
                 <View style={styles.footer}>
                     <TouchableOpacity style={[styles.button,
-                    { backgroundColor: '#6664d4' }]} onPress={() => { }} >
+                    { backgroundColor: '#6664d4' }]} onPress={() => { handleEdit() }} >
                         <Text style={styles.buttonText} >Editar</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.button} onPress={() => { handleConfirmDelete() }} >

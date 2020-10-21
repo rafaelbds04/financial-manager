@@ -45,8 +45,8 @@ interface RemoteCategory extends Error {
     response: Category[]
 }
 // const BASE_API = 'http://127.0.0.1:3000';
-// const BASE_API = 'http://192.168.1.100:3000';
-const BASE_API = 'https://financeapi.diskquentinha.com.br';
+const BASE_API = 'http://192.168.1.100:3000';
+// const BASE_API = 'https://financeapi.diskquentinha.com.br';
 
 interface ReceiptResponse {
     response: {
@@ -123,13 +123,11 @@ export default {
     getReceipt: async (code: string): Promise<ReceiptResponse> => {
         const config = await AsyncStorage.getItem('appConfig');
         const { token } = config && JSON.parse(config);
-
         try {
             const req = await fetch(`${BASE_API}/receipt/catch?code=${code}`, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'application/json',
                     'cookie': `${token}`
                 }
             })
@@ -154,6 +152,25 @@ export default {
                 body: transactionFormData
             })
             // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
+            return { ...response, statusCode: req.status };
+        } catch (error) {
+            throw error
+        }
+    },
+    updateTransaction: async (transactionData: string, transactionId: number) => {
+        try {
+            const config = await AsyncStorage.getItem('appConfig');
+            const { token } = config && JSON.parse(config);
+            const req = await fetch(`${BASE_API}/transactions/${transactionId}`, {
+                method: 'PATCH',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'cookie': `${token}`
+                },
+                body: transactionData
+            })
             const response = (typeof req === 'object') ? await req.json() : req
             return { ...response, statusCode: req.status };
         } catch (error) {
