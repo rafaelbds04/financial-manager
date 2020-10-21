@@ -36,6 +36,7 @@ export interface Transactions {
     amount: number
     transactionDate: Date
     dueDate?: Date
+    paidDate?: Date
     paid: boolean
     category: Category
 }

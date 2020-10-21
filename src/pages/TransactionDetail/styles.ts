@@ -97,7 +97,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: 50,
         height: 41
-    }
+    },
+    confirmModal: {
+        flex: 1,
+        backgroundColor: 'rgba(70, 67, 211, 0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 60
+    },
+    confirmModalFooter: {
+        flexDirection: 'row',
+    },
 })
 
 export default styles;

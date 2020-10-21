@@ -138,7 +138,7 @@ export default {
             throw 'Receipt ' + error.message
         }
     },
-    addTransaction: async (transactionFormData: FormData) => {
+    addTransaction: async (transactionFormData: FormData): Promise<RemoteFullTransactions> => {
         try {
             const config = await AsyncStorage.getItem('appConfig');
             const { token } = config && JSON.parse(config);
@@ -158,7 +158,7 @@ export default {
             throw error
         }
     },
-    updateTransaction: async (transactionData: string, transactionId: number) => {
+    updateTransaction: async (transactionData: string, transactionId: number): Promise<RemoteFullTransactions> => {
         try {
             const config = await AsyncStorage.getItem('appConfig');
             const { token } = config && JSON.parse(config);

@@ -11,6 +11,7 @@ import { catchErrorMessage, unauthorized } from '../../services/utils';
 import { formatMoney } from 'accounting';
 import moment from 'moment';
 import { showMessage } from 'react-native-flash-message';
+import DatePicker from '../../components/DatePicker/index';
 
 interface Params {
     transactionId: number
@@ -35,6 +36,9 @@ export default function TransactionDetail() {
     const [shimmerVisible, setShimmerVisible] = useState(false);
     const [transaction, setTransaction] = useState<FullTransaction>()
     const [attachmentsImages, setAttachmentsImages] = useState<any>([])
+
+    const [toConfirmPaymentDate, setToConfirmPaymentDate] = useState<Date>(new Date());
+    const [confirmPaymentModal, setConfirmPaymentModal] = useState<boolean>(false);
 
     const navigation = useNavigation();
     const route = useRoute();
@@ -62,6 +66,7 @@ export default function TransactionDetail() {
         if (transaction?.id) {
             try {
                 const { statusCode } = await api.deleteTransaction(transaction?.id)
+                if (statusCode === 401) return unauthorized(navigation);
                 if (statusCode === 200) {
                     showMessage({
                         message: 'Transação deletada com sucesso!',
@@ -86,6 +91,35 @@ export default function TransactionDetail() {
             { text: 'Apagar transação', onPress: () => { handleRemoveTransaction() } },
             { text: 'Voltar' }
         ])
+    }
+
+    async function confirmPayment() {
+        try {
+            const data = JSON.stringify({
+                paid: true,
+                paidDate: toConfirmPaymentDate
+            })
+            const { statusCode, ...response } = await api.updateTransaction(data, routeParams.transactionId)
+            showMessage({
+                message: 'Confirmando pagamento',
+                type: 'info'
+            })
+            setConfirmPaymentModal(false);
+            if (statusCode === 401) return unauthorized(navigation);
+            if (statusCode === 200) {
+                showMessage({
+                    message: 'Pagamento confirmado com sucesso!',
+                    type: 'success'
+                })
+                navigation.reset({
+                    routes: [{ name: 'Home' }]
+                })
+                return
+            }
+            throw response
+        } catch (error) {
+            catchErrorMessage(error?.message)
+        }
     }
 
     function handleEdit() {
@@ -154,7 +188,8 @@ export default function TransactionDetail() {
                     <View style={styles.actionsContent}>
                         <ShimmerPlaceholder shimmerStyle={{ borderRadius: 10, marginTop: 15 }} height={35} width={250} visible={shimmerVisible}>
                             {(!transaction?.paid) && (
-                                <TouchableOpacity style={[styles.attachmentsButton, { backgroundColor: '#37b55a' }]} onPress={() => { }} >
+                                <TouchableOpacity style={[styles.attachmentsButton,
+                                { backgroundColor: '#37b55a' }]} onPress={() => { setConfirmPaymentModal(true) }} >
                                     <Text style={styles.attachmentsText} >ADICIONAR PAGAMENTO</Text>
                                     <AntDesign name="arrowright" size={24} color="#fff" />
                                 </TouchableOpacity>
@@ -191,6 +226,23 @@ export default function TransactionDetail() {
                     </TouchableOpacity>
                 </View>
             </View>
+
+            <Modal visible={confirmPaymentModal} style={{ backgroundColor: '#6664d4' }} transparent={true}
+                onRequestClose={() => { setConfirmPaymentModal(false) }}>
+                <View style={styles.confirmModal} >
+                    <DatePicker date={toConfirmPaymentDate} onChange={setToConfirmPaymentDate} />
+
+                    <View style={styles.confirmModalFooter}>
+                        <TouchableOpacity style={styles.button} onPress={() => { setConfirmPaymentModal(false) }} >
+                            <Text style={[styles.buttonText]} >Cancelar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.button,
+                        { backgroundColor: '#37b55a' }]} onPress={() => { confirmPayment() }} >
+                            <Text style={styles.buttonText} >Confirmar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     )
 
