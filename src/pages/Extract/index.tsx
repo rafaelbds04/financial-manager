@@ -130,8 +130,8 @@ export default function Extract() {
                 break;
             case 'due':
                 return {
-                    paid: false, from: moment().toISOString(),
-                    to: moment().add(60).toISOString()
+                    paid: false,
+                    to: moment().add(60, 'days').toISOString()
                 }
                 break;
             default:

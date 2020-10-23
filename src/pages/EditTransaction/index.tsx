@@ -80,13 +80,13 @@ const EditTransaction = () => {
     useEffect(() => {
         //Listen to switch category type
         (async () => {
-            // await getCategoriesList(type)
+            await getCategoriesList(type ? CategoryType.EXPENSE : CategoryType.REVENUE)
         })();
     }, [type]);
 
-    async function getCategoriesList(inputType: boolean | string) {
+    async function getCategoriesList(inputType: string) {
         try {
-            const categoryType = (inputType || (inputType === 'expense')) ? CategoryType.EXPENSE : CategoryType.REVENUE
+            const categoryType = (inputType === 'expense') ? CategoryType.EXPENSE : CategoryType.REVENUE
             const { response, statusCode } = await api.getCategoriesByType(categoryType);
             if (statusCode === 401) return unauthorized(navigation);
             if (!response.length) return
@@ -116,7 +116,7 @@ const EditTransaction = () => {
 
     function autoFill(data: FullTransaction) {
         const { name, amount, transactionDate, dueDate, attachments, category,
-            paid, transactionType } = data;
+            transactionType } = data;
         name && setName(name);
         amount && setAmount(accounting.formatMoney(Number(amount), {
             decimal: ',',
@@ -124,11 +124,11 @@ const EditTransaction = () => {
             precision: 2,
             symbol: 'R$'
         }).toString());
-        transactionType && setType((transactionType == CategoryType.EXPENSE))
+        transactionType && setType((transactionType === CategoryType.EXPENSE))
         transactionDate && setDate(new Date(transactionDate));
         dueDate && setDueDate(new Date(date));
         attachments && setAttachmentsImages(attachments)
-        paid && setPaid(paid);
+        paid && setPaid(data.paid);
         category && setSelectedCategory(category.id)
     }
 
