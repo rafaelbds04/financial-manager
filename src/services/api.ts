@@ -2,6 +2,8 @@ import AsyncStorage from "@react-native-community/async-storage";
 import { Category, CategoryType } from "../pages/AddTransaction";
 import { Attacment } from '../pages/AddTransaction/CodeScanner/index';
 import { FullTransaction } from "../pages/TransactionDetail";
+
+import getEnvVars from '../../environment';
 /*
   url: {
     ios: localhost
@@ -57,8 +59,12 @@ interface RemoteFullTransactions extends FullTransaction, Error { }
 interface RemoteCategory extends Error {
     response: Category[]
 }
+
+
+const { baseApiUrl } = getEnvVars();
+const BASE_API = baseApiUrl;
 // const BASE_API = 'http://127.0.0.1:3000';
-const BASE_API = 'http://192.168.1.100:3000';
+// const BASE_API = 'http://192.168.1.100:3000';
 // const BASE_API = 'https://financeapi.diskquentinha.com.br';
 
 interface ReceiptResponse {
