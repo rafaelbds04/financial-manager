@@ -1,21 +1,31 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import styles from './styles';
-import { LineChart} from 'react-native-svg-charts'
+import { LineChart } from 'react-native-svg-charts'
 import ShimmerPlaceholder from 'react-native-shimmer-placeholder'
 import * as shape from 'd3-shape'
+import { useNavigation } from '@react-navigation/native';
 
 interface SummaryCardProps {
     color: string,
     title: string,
+    type: string,
     value?: number
     chartsData: Number[]
 }
 
 const SummaryCard: React.FC<SummaryCardProps> = (item) => {
+
+    const navigation = useNavigation();
+
+    function handleNavigateToExtract(type: string) {
+        navigation.navigate('Extract', { type: item.type })
+    }
+
     return (
-        <View style={[styles.summaryCard,
-        { backgroundColor: item.color }]}>
+        <TouchableOpacity style={[styles.summaryCard,
+        { backgroundColor: item.color }]}
+            onPress={() => item.value && handleNavigateToExtract(item.type)} >
             <View>
                 <Text style={styles.summaryCardSubtitle}>
                     {item.title}</Text>
@@ -44,7 +54,8 @@ const SummaryCard: React.FC<SummaryCardProps> = (item) => {
                 >
                 </LineChart>
             </ShimmerPlaceholder>
-        </View>
+
+        </TouchableOpacity>
     );
 }
 

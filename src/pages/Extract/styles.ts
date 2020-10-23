@@ -5,11 +5,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: 30,
-        paddingHorizontal: 30,
+        // paddingHorizontal: 15,
         backgroundColor: '#4643d3'
     },
     header: {
         paddingTop: 30,
+        paddingHorizontal: 30,
         flexDirection: 'row',
         justifyContent: 'space-between'
     },
@@ -22,11 +23,13 @@ const styles = StyleSheet.create({
         marginTop: 50,
     },
     selectionList:{
-        marginTop: 20,
-        height: 30
+        marginTop: 25,
+        height: 30,
+        paddingLeft: 20
     },
     content: {
         flex: 1,
+        paddingHorizontal: 20,
         // justifyContent: 'space-between',
         marginTop: 10
     },

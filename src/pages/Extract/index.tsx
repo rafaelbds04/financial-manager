@@ -1,30 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import styles from './styles';
-import { View, Text, TouchableOpacity, ScrollView, Alert, Modal, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import ImageViewer from 'react-native-image-zoom-viewer';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Transactions } from '../Home';
-import ShimmerPlaceholder from 'react-native-shimmer-placeholder'
 import api, { TransactionsParamsOptions } from '../../services/api';
 import { catchErrorMessage, unauthorized } from '../../services/utils';
-import { formatMoney } from 'accounting';
 import moment from 'moment';
-import { showMessage } from 'react-native-flash-message';
-import DatePicker from '../../components/DatePicker/index';
 import TransactionCardShimmer from '../../components/TransactionCardShimmer';
-import PageHeader from '../../components/PageHeader/index';
 import SelectionHorizontalList from '../../components/SelectionHorizontalList';
 import TransactionCard from '../../components/TransactionCard';
 
 interface Params {
-    transactionId: number
+    type?: string
 }
 
 export default function Extract() {
 
     const [modalVisible, setModalVisible] = useState(false);
-    const [shimmerVisible, setShimmerVisible] = useState(false);
     const [seletedType, setSeletedType] = useState('all');
     const [fetchOptions, setFetchOptions] = useState<TransactionsParamsOptions>();
 
@@ -35,7 +28,7 @@ export default function Extract() {
         { name: 'Despesas', value: 'expense' },
         { name: 'Receitas', value: 'revenue' },
         { name: 'Vencido', value: 'overdue' },
-        { name: 'À vencer', value: 'todue' }
+        { name: 'À vencer', value: 'due' }
     ]
 
     const navigation = useNavigation();
@@ -45,7 +38,8 @@ export default function Extract() {
     useEffect(() => {
         (async () => {
             try {
-                await fetchTransactions();
+                routeParams?.type ? handleChangeSeletedTransactionType(routeParams?.type)
+                    : await fetchTransactions()
             } catch (error) {
                 catchErrorMessage(error?.message)
             }
@@ -72,11 +66,12 @@ export default function Extract() {
     }
 
     async function handleChangeSeletedTransactionType(item: string) {
-        console.log(item)
         if (seletedType !== item) {
             setSeletedType(item);
             try {
-                await fetchTransactions(getParamsOptionsFromTypeName(item));
+                const params = { ...getParamsOptionsFromTypeName(item), skip: '0' }
+                await fetchTransactions(params);
+                setFetchOptions(params);
             } catch (error) {
                 catchErrorMessage(error?.message)
             }
@@ -97,7 +92,7 @@ export default function Extract() {
             case 'overdue':
                 return { paid: false }
                 break;
-            case 'todue':
+            case 'due':
                 return {
                     paid: false, from: moment().toISOString(),
                     to: moment().add(60).toISOString()

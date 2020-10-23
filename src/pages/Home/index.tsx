@@ -189,10 +189,10 @@ export default function Home() {
 
             <View style={styles.summaryContainer}>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                    <SummaryCard color={'#37b55a'} title={'Receita'} chartsData={chartsData.revenue} value={summaryValue.revenue} />
-                    <SummaryCard color={'#4643d3'} title={'Despesa'} chartsData={chartsData.expense} value={summaryValue.expense} />
-                    <SummaryCard color={'#f58218'} title={'À vencer'} chartsData={chartsData.due} value={summaryValue.due} />
-                    <SummaryCard color={'#ff344c'} title={'Vencido'} chartsData={chartsData.overDue} value={summaryValue.overDue} />
+                    <SummaryCard color={'#37b55a'} title={'Receita'} type={'revenue'} chartsData={chartsData.revenue} value={summaryValue.revenue} />
+                    <SummaryCard color={'#4643d3'} title={'Despesa'} type={'expense'} chartsData={chartsData.expense} value={summaryValue.expense} />
+                    <SummaryCard color={'#f58218'} title={'À vencer'} type={'due'} chartsData={chartsData.due} value={summaryValue.due} />
+                    <SummaryCard color={'#ff344c'} title={'Vencido'} type={'overdue'} chartsData={chartsData.overDue} value={summaryValue.overDue} />
                 </ScrollView>
             </View>
 
