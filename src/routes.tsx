@@ -11,6 +11,7 @@ import SingIn from './pages/SingIn/index';
 import CodeScanner from './pages/AddTransaction/CodeScanner';
 import TransactionDetail from './pages/TransactionDetail';
 import EditTransaction from './pages/EditTransaction';
+import Extract from './pages/Extract';
 
 const AppStack = createStackNavigator();
 
@@ -35,6 +36,7 @@ const Routes = () => {
                 <AppStack.Screen name='AttacmentCamera' component={AttacmentCamera} />
                 <AppStack.Screen name='CodeScanner' component={CodeScanner} />
                 <AppStack.Screen name='EditTransaction' component={EditTransaction} />
+                <AppStack.Screen name='Extract' component={Extract} />
 
                 
 

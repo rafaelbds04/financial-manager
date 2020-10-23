@@ -103,7 +103,7 @@ export default function Home() {
         // },
         {
             name: 'Extrato \n',
-            action: 'AddTransaction',
+            action: 'Extract',
             icon: 'barschart',
             key: '3'
         },

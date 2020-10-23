@@ -26,6 +26,15 @@ interface RemoteSummary extends Error {
     revenue: number,
 }
 
+export interface TransactionsParamsOptions {
+    take?: string; skip?: string;
+    name?: string
+    from?: string; to?: string
+    paid?: boolean
+    transactionType?: string
+    category?: string
+}
+
 interface RemoteTransactions extends Error {
     data: {
         id: number
@@ -200,6 +209,25 @@ export default {
             const config = await AsyncStorage.getItem('appConfig');
             const { token } = config && JSON.parse(config);
             const req = await fetch(`${BASE_API}/transactions/?take=${take}&skip=${skip}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'cookie': `${token}`
+                },
+            })
+            // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
+            return { data: response, statusCode: req.status };
+        } catch (error) {
+            throw error
+        }
+    },
+    getTransactions: async (optionsParams?: TransactionsParamsOptions): Promise<RemoteTransactions> => {
+        try {
+            const config = await AsyncStorage.getItem('appConfig');
+            const { token } = config && JSON.parse(config);
+            const urlParams = new URLSearchParams(<URLSearchParams>optionsParams).toString()
+            const req = await fetch(`${BASE_API}/transactions/?${urlParams}`, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',
