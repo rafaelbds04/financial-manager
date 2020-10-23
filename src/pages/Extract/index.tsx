@@ -15,13 +15,20 @@ interface Params {
     type?: string
 }
 
+interface TransactionsExtract {
+    data: Transactions[] | undefined,
+    totalCount?: number | string | null
+}
+
 export default function Extract() {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [seletedType, setSeletedType] = useState('all');
-    const [fetchOptions, setFetchOptions] = useState<TransactionsParamsOptions>();
+    const [fetchOptions, setFetchOptions] = useState<TransactionsParamsOptions>({});
 
-    const [transactions, setTransactions] = useState<Transactions[] | undefined>();
+    const [transactions, setTransactions] = useState<TransactionsExtract>();
+    const [loadingTransactions, setLoadingTransactions] = useState(false);
+    const [loadingMoreTransactions, setLoadingMoreTransactions] = useState(false);
 
     const selectLisTypeData = [
         { name: 'Todas', value: 'all' },
@@ -48,11 +55,15 @@ export default function Extract() {
 
     async function fetchTransactions(fetchOptions?: TransactionsParamsOptions) {
         try {
+            setLoadingTransactions(true)
             const response = await api.getTransactions(fetchOptions);
             if (response.statusCode === 401) return unauthorized(navigation);
             if (response.error) throw response
-            setTransactions(response.data);
+            setTransactions({ data: response.data, totalCount: response.totalCount });
+            setFetchOptions({ skip: '0' });
+            setLoadingTransactions(false)
         } catch (error) {
+            setLoadingTransactions(false)
             catchErrorMessage(error?.message);
         }
     }
@@ -75,6 +86,31 @@ export default function Extract() {
             } catch (error) {
                 catchErrorMessage(error?.message)
             }
+        }
+    }
+
+    async function loadMoreTransactions() {
+        const totalCount = (Number(transactions?.totalCount));
+        if (totalCount > (Number(fetchOptions?.skip) + (totalCount % 15))) {
+            try {
+                setLoadingMoreTransactions(true);
+                const nextSkip = (Number(fetchOptions?.skip)) + 15
+                const newOptions = { ...fetchOptions, skip: nextSkip.toString() }
+                setFetchOptions(newOptions);
+                const response = await api.getTransactions(newOptions);
+                if (response.statusCode === 401) return unauthorized(navigation);
+
+                setTransactions({
+                    data: [...transactions?.data!, ...response.data],
+                    totalCount: response.totalCount
+                })
+                setLoadingMoreTransactions(false);
+
+            } catch (error) {
+                setLoadingMoreTransactions(false);
+                catchErrorMessage(error?.message)
+            }
+
         }
     }
 
@@ -120,19 +156,21 @@ export default function Extract() {
             </View>
 
             <View style={styles.content}>
-                {transactions ? (<>
-                    <FlatList
-                        data={transactions}
+                {
+                    !loadingTransactions ? (<FlatList
+                        data={transactions?.data}
                         showsVerticalScrollIndicator={false}
                         keyExtractor={(item) => item.id.toString()}
+                        onEndReached={() => loadMoreTransactions()}
+                        onEndReachedThreshold={0.05}
+                        ListFooterComponent={loadingMoreTransactions ? (<TransactionCardShimmer repetitions={6} />) : null}
                         renderItem={({ item }) => {
                             return (
                                 <TransactionCard data={item}
                                     onPress={() => handleNavigateToTransactionDetail(item.id)} />
                             );
-                        }} /></>) : (<>
-                            <TransactionCardShimmer repetitions={8} />
-                        </>)}
+                        }} />) : (<><TransactionCardShimmer repetitions={8} /></>)
+                }
             </View>
 
             <Modal visible={modalVisible} style={{ backgroundColor: '#6664d4' }} transparent={true}

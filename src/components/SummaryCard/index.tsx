@@ -24,7 +24,7 @@ const SummaryCard: React.FC<SummaryCardProps> = (item) => {
 
     return (
         <TouchableOpacity style={[styles.summaryCard,
-        { backgroundColor: item.color }]}
+        { backgroundColor: item.color }]} activeOpacity={1}
             onPress={() => item.value && handleNavigateToExtract(item.type)} >
             <View>
                 <Text style={styles.summaryCardSubtitle}>

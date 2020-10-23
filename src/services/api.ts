@@ -13,6 +13,10 @@ import { FullTransaction } from "../pages/TransactionDetail";
   }
 */
 
+export interface Index {
+    totalCount?: string | number | null
+}
+
 export interface Error {
     statusCode?: number,
     message?: string,
@@ -35,7 +39,7 @@ export interface TransactionsParamsOptions {
     category?: string
 }
 
-interface RemoteTransactions extends Error {
+interface RemoteTransactions extends Error, Index {
     data: {
         id: number
         name: string
@@ -235,8 +239,10 @@ export default {
                 },
             })
             // const response = await req.json();
+            const totalCount = req.headers.get('X-total-count')
             const response = (typeof req === 'object') ? await req.json() : req
-            return { data: response, statusCode: req.status };
+            if (response.error) throw response
+            return { data: response, totalCount, statusCode: req.status };
         } catch (error) {
             throw error
         }
