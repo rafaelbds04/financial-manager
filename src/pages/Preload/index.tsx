@@ -18,68 +18,71 @@ export default function Preload() {
         try {
             const update = await Updates.checkForUpdateAsync();
             if (update.isAvailable) {
-              await Updates.fetchUpdateAsync();
-              showMessage({
-                message: 'Atualização disponível!',
-                description: 'Aguarde enquanto estamos atualizado o seu APP.',
-                type: "warning",
-                autoHide: false
-            })
-              await Updates.reloadAsync();
+                await Updates.fetchUpdateAsync();
+                showMessage({
+                    message: 'Atualização disponível!',
+                    description: 'Aguarde enquanto estamos atualizado o seu APP.',
+                    type: "warning",
+                    autoHide: false
+                })
+                await Updates.reloadAsync();
             }
-          } catch (error) {
+        } catch (error) {
             catchErrorMessage(error?.message);
-          }
+        }
     }
 
-    useEffect(() => {
-        setMomentLocale();
-        const checkToken = async () => {
-            const config = await AsyncStorage.getItem('appConfig')
-            const { token } = config ? JSON.parse(config) : '';
+    const checkToken = async () => {
+        const config = await AsyncStorage.getItem('appConfig')
+        const { token } = config ? JSON.parse(config) : '';
 
-            try {
-                if (token) {
-                    const response = await api.checkToken(token);
-                    if (response.status === 200) {
+        try {
+            if (token) {
+                const response = await api.checkToken(token);
+                if (response.status === 200) {
 
-                        //TODO: ADD REDUCER AND CONTEXT API
-                        dispatch({
-                            type: 'setName',
-                            payload: {
-                                name: response.name
-                            }
-                        });
+                    //TODO: ADD REDUCER AND CONTEXT API
+                    dispatch({
+                        type: 'setName',
+                        payload: {
+                            name: response.name
+                        }
+                    });
 
-                        showMessage({
-                            message: 'Bem vindo de volta!',
-                            description: 'Logado com sucesso.',
-                            type: "success",
-                            duration: 2300
-                        })
+                    showMessage({
+                        message: 'Bem vindo de volta!',
+                        description: 'Logado com sucesso.',
+                        type: "success",
+                        duration: 2300
+                    })
 
-                        navigation.reset({
-                            routes: [{ name: 'Home' }]
-                        })
-
-                    } else {
-                        navigation.reset({
-                            routes: [{ name: 'SingIn' }]
-                        })
-                    }
+                    navigation.reset({
+                        routes: [{ name: 'Home' }]
+                    })
 
                 } else {
                     navigation.reset({
                         routes: [{ name: 'SingIn' }]
                     })
                 }
-            } catch (error) {
-                catchErrorMessage(error?.message);
-            }
 
+            } else {
+                navigation.reset({
+                    routes: [{ name: 'SingIn' }]
+                })
+            }
+        } catch (error) {
+            catchErrorMessage(error?.message);
         }
-        checkToken();
-        checkUpdate();
+
+    }
+
+    useEffect(() => {
+        (async () => {
+            setMomentLocale();
+            await checkUpdate();
+            checkToken();
+        })()
     }, []);
 
     return (
