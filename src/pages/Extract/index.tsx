@@ -11,12 +11,14 @@ import TransactionCardShimmer from '../../components/TransactionCardShimmer';
 import SelectionHorizontalList from '../../components/SelectionHorizontalList';
 import TransactionCard from '../../components/TransactionCard';
 
+type TypeValues = 'all' | 'revenue' | 'expense' | 'overdue' | 'due'
+
 interface Params {
-    type?: string
+    type?: TypeValues
 }
 
 interface TransactionsExtract {
-    data: Transactions[] | undefined,
+    data?: Transactions[]
     totalCount?: number | string | null
 }
 
@@ -76,7 +78,7 @@ export default function Extract() {
         navigation.goBack();
     }
 
-    async function handleChangeSeletedTransactionType(item: string) {
+    async function handleChangeSeletedTransactionType(item: TypeValues) {
         if (seletedType !== item) {
             setSeletedType(item);
             try {
@@ -86,6 +88,17 @@ export default function Extract() {
             } catch (error) {
                 catchErrorMessage(error?.message)
             }
+        }
+    }
+
+    async function handleFetchCustomOptions(item: TypeValues) {
+        setSeletedType('all');
+        try {
+            const params = { ...getParamsOptionsFromTypeName(item), skip: '0' }
+            await fetchTransactions(params);
+            setFetchOptions(params);
+        } catch (error) {
+            catchErrorMessage(error?.message)
         }
     }
 
@@ -114,7 +127,7 @@ export default function Extract() {
         }
     }
 
-    function getParamsOptionsFromTypeName(type: string): TransactionsParamsOptions {
+    function getParamsOptionsFromTypeName(type?: TypeValues): TransactionsParamsOptions {
         switch (type) {
             case 'all':
                 return {}
@@ -139,6 +152,17 @@ export default function Extract() {
         }
     }
 
+    const modalBody = (
+        <View style={styles.modal}>
+            <View style={styles.content}>
+
+            </View>
+            <View style={styles.modalFooter}>
+                
+            </View>
+        </View>
+    )
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -152,7 +176,7 @@ export default function Extract() {
             </View>
             <View style={styles.selectionList}>
                 <SelectionHorizontalList data={selectLisTypeData} seleted={seletedType}
-                    onChangeSeleted={(item: string) => handleChangeSeletedTransactionType(item)} />
+                    onChangeSeleted={(item: TypeValues) => handleChangeSeletedTransactionType(item)} />
             </View>
 
             <View style={styles.content}>
@@ -175,6 +199,7 @@ export default function Extract() {
 
             <Modal visible={modalVisible} style={{ backgroundColor: '#6664d4' }} transparent={true}
                 onRequestClose={() => { }}>
+                {modalBody}
             </Modal>
         </View>
     )

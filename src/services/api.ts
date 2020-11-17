@@ -4,16 +4,6 @@ import { Attacment } from '../pages/AddTransaction/CodeScanner/index';
 import { FullTransaction } from "../pages/TransactionDetail";
 
 import getEnvVars from '../../environment';
-/*
-  url: {
-    ios: localhost
-    android: {
-      android studio: 10.0.2.2,
-      genymotion: 10.0.3.2,
-      phone via usb: your ip
-    }
-  }
-*/
 
 export interface Index {
     totalCount?: string | number | null
@@ -61,8 +51,8 @@ interface RemoteCategory extends Error {
 }
 
 
-const { baseApiUrl } = getEnvVars();
-const BASE_API = baseApiUrl;
+const env = getEnvVars();
+const BASE_API = env?.baseApiUrl;
 // const BASE_API = 'http://127.0.0.1:3000';
 // const BASE_API = 'http://192.168.1.100:3000';
 // const BASE_API = 'https://financeapi.diskquentinha.com.br';

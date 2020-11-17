@@ -33,7 +33,10 @@ const styles = StyleSheet.create({
         // justifyContent: 'space-between',
         marginTop: 10
     },
-    confirmModal: {
+    modalFooter: {
+
+    },
+    modal: {
         flex: 1,
         backgroundColor: 'rgba(70, 67, 211, 0.8)',
         justifyContent: 'center',

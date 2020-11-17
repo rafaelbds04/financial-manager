@@ -1,0 +1,33 @@
+import Constants from "expo-constants";
+import { Platform } from "react-native";
+
+interface Environment {
+  (env?: string | undefined): { baseApiUrl?: string; } | undefined
+}
+
+const localhost =
+  Platform.OS === "ios" ? "http://localhost:3000" : "http://10.0.2.2:3000";
+
+const ENV = {
+  dev: {
+    baseApiUrl: localhost,
+  },
+  staging: {
+    baseApiUrl: 'https://api.example.com',
+  },
+  prod: {
+    baseApiUrl: 'https://api.example.com',
+  }
+};
+
+const getEnvVars: Environment = (env = Constants.manifest.releaseChannel) => {
+  if (__DEV__) {
+    return ENV.dev;
+  } else if (env === 'staging') {
+    return ENV.staging;
+  } else if (env === 'prod' || env === 'default') {
+    return ENV.prod;
+  }
+};
+
+export default getEnvVars;
