@@ -63,9 +63,8 @@ export default function TransactionDetail() {
 
     function serializeTransaction(transaction: FullTransaction): FullTransaction {
         const serializedAttachments = transaction.attachments?.map(value => {
-            const attachmentSplitedToGetFilenameExtension = value.url.split('.')
-            const attachmentFilenameExtension = attachmentSplitedToGetFilenameExtension[attachmentSplitedToGetFilenameExtension.length - 1]
-            if (attachmentFilenameExtension === 'pdf') {
+            const attachmentsFileExtension = value.url.split('.').pop()
+            if (attachmentsFileExtension === 'pdf') {
                 return {
                     ...value,
                     url: Asset.fromModule(require('../../assets/PDF_icon.png')).uri,
