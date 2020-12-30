@@ -139,12 +139,17 @@ export default function Extract() {
                 return { transactionType: 'expense' }
                 break;
             case 'overdue':
-                return { paid: false }
+                return {
+                    paid: false,
+                    dueStartDate: moment().subtract(180, 'days').toISOString(),
+                    dueEndDate: moment().toISOString()
+                }
                 break;
             case 'due':
                 return {
                     paid: false,
-                    to: moment().add(60, 'days').toISOString()
+                    dueStartDate: moment().toISOString(),
+                    dueEndDate: moment().add(180, 'days').toISOString()
                 }
                 break;
             default:
@@ -158,7 +163,7 @@ export default function Extract() {
 
             </View>
             <View style={styles.modalFooter}>
-                
+
             </View>
         </View>
     )
@@ -185,7 +190,7 @@ export default function Extract() {
                         data={transactions?.data}
                         showsVerticalScrollIndicator={false}
                         keyExtractor={(item) => item.id.toString()}
-                        onEndReached={() => loadMoreTransactions()}
+                        onEndReached={async () => await loadMoreTransactions()}
                         onEndReachedThreshold={0.05}
                         ListFooterComponent={loadingMoreTransactions ? (<TransactionCardShimmer repetitions={6} />) : null}
                         renderItem={({ item }) => {

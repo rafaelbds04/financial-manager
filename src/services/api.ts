@@ -26,6 +26,7 @@ export interface TransactionsParamsOptions {
     take?: string; skip?: string;
     name?: string
     from?: string; to?: string
+    dueStartDate?: string; dueEndDate?: string
     paid?: boolean
     transactionType?: string
     category?: string
