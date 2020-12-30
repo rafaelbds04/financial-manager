@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './styles';
-import { View, Text, TouchableOpacity, ScrollView, Alert, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Modal, Linking } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -12,18 +12,20 @@ import { formatMoney } from 'accounting';
 import moment from 'moment';
 import { showMessage } from 'react-native-flash-message';
 import DatePicker from '../../components/DatePicker/index';
+import { Asset } from 'expo-asset';
 
 interface Params {
     transactionId: number
 }
 
 export interface FullTransaction extends Transactions {
-    attachments?: [
-        {
-            id: number,
-            url: string,
-            key: string
-        }]
+    attachments?:
+    {
+        id: number,
+        url: string,
+        key: string,
+        defaultUrl?: string
+    }[]
     author?: {
         name: string,
         email: string,
@@ -35,7 +37,6 @@ export default function TransactionDetail() {
     const [modalVisible, setModalVisible] = useState(false);
     const [shimmerVisible, setShimmerVisible] = useState(false);
     const [transaction, setTransaction] = useState<FullTransaction>()
-    const [attachmentsImages, setAttachmentsImages] = useState<any>([])
 
     const [toConfirmPaymentDate, setToConfirmPaymentDate] = useState<Date>(new Date());
     const [confirmPaymentModal, setConfirmPaymentModal] = useState<boolean>(false);
@@ -52,15 +53,29 @@ export default function TransactionDetail() {
                     const errorMsg = response.message || response.error;
                     catchErrorMessage(errorMsg!);
                 }
-                setTransaction(response);
+                setTransaction(serializeTransaction(response));
                 setShimmerVisible(true);
-                setAttachmentsImages(response.attachments)
             } catch (error) {
                 catchErrorMessage(error?.message)
             }
         })()
     }, [])
 
+    function serializeTransaction(transaction: FullTransaction): FullTransaction {
+        const serializedAttachments = transaction.attachments?.map(value => {
+            const attachmentSplitedToGetFilenameExtension = value.url.split('.')
+            const attachmentFilenameExtension = attachmentSplitedToGetFilenameExtension[attachmentSplitedToGetFilenameExtension.length - 1]
+            if (attachmentFilenameExtension === 'pdf') {
+                return {
+                    ...value,
+                    url: Asset.fromModule(require('../../assets/PDF_icon.png')).uri,
+                    defaultUrl: value.url
+                }
+            }
+            return { ...value }
+        })
+        return { ...transaction, attachments: serializedAttachments }
+    }
 
     async function handleRemoveTransaction() {
         if (transaction?.id) {
@@ -197,7 +212,7 @@ export default function TransactionDetail() {
                         </ShimmerPlaceholder>
 
                         <ShimmerPlaceholder shimmerStyle={{ borderRadius: 10, marginTop: 15 }} height={35} width={250} visible={shimmerVisible}>
-                            {(attachmentsImages.length > 0) && (<>
+                            {(transaction?.attachments?.length! > 0) && (<>
                                 <TouchableOpacity style={styles.attachmentsButton}
                                     onPress={() => { setModalVisible(true) }} >
                                     <Text style={styles.attachmentsText} >VER ANEXOS</Text>
@@ -212,6 +227,11 @@ export default function TransactionDetail() {
                         <ImageViewer
                             imageUrls={transaction?.attachments}
                             enableSwipeDown={true}
+                            onClick={(func, index) => {
+                                if (transaction?.attachments?.[index!].defaultUrl) {
+                                    Linking.openURL(transaction?.attachments?.[index!].defaultUrl!)
+                                }
+                            }}
                             onCancel={() => setModalVisible(false)} />
                     </Modal>
 
