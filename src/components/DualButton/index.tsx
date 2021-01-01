@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import styles from './styles';
 
 interface DualButtonProps {
-    value: boolean,
+    value?: boolean,
     onChange: Function,
     sectionName: string
     btn1Name: string,

@@ -57,7 +57,7 @@ const AddTransaction = () => {
     const [name, setName] = useState('');
     const [amount, setAmount] = useState('');
     const [paid, setPaid] = useState(true);
-    const [type, setType] = useState(true);
+    const [type, setType] = useState<boolean>();
     const [date, setDate] = useState(currentDate);
     const [dueDate, setDueDate] = useState(currentDate);
     const [blockActions, setBlockActions] = useState(false);
@@ -68,7 +68,7 @@ const AddTransaction = () => {
     ]);
 
     //On mount, component get params and set transaction type
-    useEffect(() => { (routeParams?.type == 'revenue') && setType(false) }, [])
+    useEffect(() => { (routeParams?.type == 'revenue') ? setType(false) : setType(true) }, [])
 
     useEffect(() => {
         //Listen to switch category type
