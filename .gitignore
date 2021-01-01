@@ -10,6 +10,6 @@ npm-debug.*
 web-build/
 notes.txt
 environment.ts
-
+*.log
 # macOS
 .DS_Store
