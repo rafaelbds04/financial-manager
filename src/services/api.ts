@@ -25,7 +25,7 @@ interface RemoteSummary extends Error {
 export interface TransactionsParamsOptions {
     take?: string; skip?: string;
     name?: string
-    from?: string; to?: string
+    from?: string | Date; to?: string | Date;
     dueStartDate?: string; dueEndDate?: string
     paid?: boolean
     transactionType?: string
@@ -115,6 +115,27 @@ export default {
 
         try {
             const req = await fetch(`${BASE_API}/categories/${type}`, {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'cookie': `${token}`
+                }
+            })
+            // const response = await req.json();
+            const response = (typeof req === 'object') ? await req.json() : req
+
+            return { response, statusCode: req.status };
+        } catch (error) {
+            throw 'Catching categories ' + error.message
+        }
+    },
+    getAllCategories: async (): Promise<RemoteCategory> => {
+        const config = await AsyncStorage.getItem('appConfig');
+        const { token } = config && JSON.parse(config);
+
+        try {
+            const req = await fetch(`${BASE_API}/categories/`, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',

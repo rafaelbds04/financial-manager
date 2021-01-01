@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native'
-import { Roboto_700Bold } from '@expo-google-fonts/roboto';
 //'#6664d4'
 const styles = StyleSheet.create({
     container: {
@@ -22,7 +21,7 @@ const styles = StyleSheet.create({
     topContent: {
         marginTop: 50,
     },
-    selectionList:{
+    selectionList: {
         marginTop: 25,
         height: 30,
         paddingLeft: 20
@@ -31,20 +30,52 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 20,
         // justifyContent: 'space-between',
-        marginTop: 10
+        marginTop: 10,
     },
     modalFooter: {
-
+        marginBottom: 20
+    },
+    button: {
+        height: 45,
+        marginHorizontal: 10,
+        // width: 130,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#37b55a',
+        borderRadius: 10
+    },
+    buttonText: {
+        fontFamily: 'Roboto_500Medium',
+        color: '#fff',
     },
     modal: {
         flex: 1,
         backgroundColor: 'rgba(70, 67, 211, 0.8)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 60
+        paddingTop: 50,
+        paddingHorizontal: 20,
+        alignContent: 'space-between'
     },
     confirmModalFooter: {
         flexDirection: 'row',
+    },
+    inputContainer: {
+        marginHorizontal: 20,
+        marginBottom: 8,
+    },
+    input: {
+        height: 45,
+        backgroundColor: '#fff',
+        fontSize: 16,
+        // color: '#b9b9b9',
+        paddingLeft: 15,
+        borderRadius: 10,
+        borderWidth: 0.5,
+        borderColor: '#dedede'
+    },
+    inputTitle: {
+        color: '#b9b9b9',
+        fontSize: 12,
+        fontFamily: 'Roboto_500Medium'
     },
 })
 
