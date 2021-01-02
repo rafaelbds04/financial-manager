@@ -189,6 +189,7 @@ export default function Extract() {
         try {
             setModalVisible(false);
             await fetchTransactions({ ...params, skip: '0' });
+            setFetchOptions({ ...params, skip: '0' })
         } catch (error) {
             catchErrorMessage(error?.message)
         }
