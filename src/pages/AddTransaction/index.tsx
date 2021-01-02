@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Text, TouchableOpacity, Image, ScrollView, FlatList, Modal } from 'react-native'
 import PageHeader from '../../components/PageHeader';
 import { AntDesign } from '@expo/vector-icons';
-import { TextInputMask } from 'react-native-masked-text'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import TransactionDatePicker from '../../components/TransactionDatePicker';
 import CategorySelector from '../../components/CategorySelector'

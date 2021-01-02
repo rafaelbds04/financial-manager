@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, createRef } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { Entypo } from '@expo/vector-icons';
 import styles from './styles';
 
 import { Camera, CameraCapturedPicture } from 'expo-camera';
 import PageHeader from '../../../components/PageHeader';
 import { useNavigation } from '@react-navigation/native';
+import * as DocumentPicker from 'expo-document-picker';
 
 interface AttacmentCameraProps {
 }
@@ -43,6 +45,14 @@ const AttacmentCamera: React.FC<AttacmentCameraProps> = () => {
             setCapturedImage(data?.uri)
         }
     }
+
+    async function handleSelectAttachment() {
+        const documnet = await DocumentPicker.getDocumentAsync()
+        if (documnet.type === 'success') {
+            navigation.navigate('AddTransaction', { attachmentImage: documnet.uri })
+        }
+    }
+
     async function handleAddAttacment() {
         navigation.navigate('AddTransaction', { attachmentImage: capturedImage })
     }
@@ -51,7 +61,11 @@ const AttacmentCamera: React.FC<AttacmentCameraProps> = () => {
         <>
             {!capturedImage ? (
                 <>
-                    < PageHeader title={'Adicionar anexo da câmera'} />
+                    < PageHeader title={'Adicionar anexo da câmera'}
+                        additionalIcon={
+                            <TouchableOpacity onPress={() => handleSelectAttachment()}>
+                                <Entypo name="attachment" size={20} color="white" />
+                            </TouchableOpacity>} />
                     <View style={styles.contaier}>
                         <Camera style={{ flex: 1 }}
                             type={type}

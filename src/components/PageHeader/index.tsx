@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 interface PageHedaerProps {
     title: string
+    additionalIcon?: ReactNode
 }
 
-const PageHeader: React.FC<PageHedaerProps> = ({ title }) => {
+const PageHeader: React.FC<PageHedaerProps> = ({ title, additionalIcon }) => {
 
     const { goBack } = useNavigation();
 
@@ -26,7 +27,7 @@ const PageHeader: React.FC<PageHedaerProps> = ({ title }) => {
                 </TouchableOpacity>
                 <Text style={styles.title} >{title}</Text>
 
-                <View></View>
+                <View>{additionalIcon}</View>
             </View>
 
         </View >
