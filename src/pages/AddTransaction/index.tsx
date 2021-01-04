@@ -67,31 +67,17 @@ const AddTransaction = () => {
     ]);
 
     //On mount, component get params and set transaction type
-    useEffect(() => { (routeParams?.type == 'revenue') ? setType(false) : setType(true) }, [])
-
     useEffect(() => {
-        //Listen to switch category type
-        (async () => {
-            try {
-                const categoryType = type ? CategoryType.EXPENSE : CategoryType.REVENUE
-                const { response, statusCode } = await api.getCategoriesByType(categoryType);
-                if (statusCode === 401) return unauthorized(navigation);
-                if (!response.length) return
-                const data = response.map((item: Category) => {
-                    const data = {
-                        label: item.name,
-                        value: item.id
-                    };
-                    return data;
-                });
-                if (!data.length) return
-                setCategoriesItems(data);
-                setSelectedCategory(data[0].value)
-            } catch (error) {
-                catchErrorMessage(error?.message)
+        if (type === undefined) {
+            if (routeParams?.type == 'expense') {
+                setType(true)
+                setCategoryList(true);
+            } else {
+                setType(false)
+                setCategoryList(false);
             }
-        })();
-    }, [type]);
+        }
+    }, [])
 
     //Every time when scans and go back to the screen called the function to fetch a receipt.
     useEffect(() => {
@@ -137,6 +123,27 @@ const AddTransaction = () => {
     function handleChangeCategory(item: CategorySelectorItem) {
         setSelectedCategory(item.value);
     }
+
+    async function setCategoryList(type: boolean) {
+        try {
+            const categoryType = type ? CategoryType.EXPENSE : CategoryType.REVENUE
+            const { response, statusCode } = await api.getCategoriesByType(categoryType);
+            if (statusCode === 401) return unauthorized(navigation);
+            if (!response.length) return
+            const data = response.map((item: Category) => {
+                const data = {
+                    label: item.name,
+                    value: item.id
+                };
+                return data;
+            });
+            if (!data.length) return
+            setCategoriesItems(data);
+            setSelectedCategory(data[0].value)
+        } catch (error) {
+            catchErrorMessage(error?.message)
+        }
+    };
 
     async function catchReceipt(data: string) {
         try {
@@ -276,7 +283,7 @@ const AddTransaction = () => {
                     </View>
 
                     <DualButton sectionName={'Tipo'} btn1Name={'Despesa'}
-                        btn2Name={'Receita'} value={type} onChange={setType} />
+                        btn2Name={'Receita'} value={type} onChange={(value: boolean) => { setType(value); setCategoryList(value) }} />
 
                     <DualButton sectionName={'Pagamento'} btn1Name={'Pago'}
                         btn2Name={'Não pago'} value={paid} onChange={setPaid} />
