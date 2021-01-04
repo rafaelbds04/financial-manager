@@ -48,7 +48,7 @@ const EditTransaction = () => {
     const [name, setName] = useState('');
     const [amount, setAmount] = useState('');
     const [paid, setPaid] = useState(true);
-    const [type, setType] = useState(true);
+    const [type, setType] = useState<boolean>();
     const [date, setDate] = useState(currentDate);
     const [dueDate, setDueDate] = useState(date);
 
@@ -68,25 +68,16 @@ const EditTransaction = () => {
                     const errorMsg = response.message || response.error;
                     catchErrorMessage(errorMsg!);
                 }
-                await getCategoriesList(response.category.categoryType)
-                autoFill(response);
+                await autoFill(response);
             } catch (error) {
                 catchErrorMessage(error?.message)
             }
         })()
     }, [])
 
-
-    useEffect(() => {
-        //Listen to switch category type
-        (async () => {
-            await getCategoriesList(type ? CategoryType.EXPENSE : CategoryType.REVENUE)
-        })();
-    }, [type]);
-
-    async function getCategoriesList(inputType: string) {
+    async function getCategoriesList(inputType: boolean, seletedCategory?: number) {
         try {
-            const categoryType = (inputType === 'expense') ? CategoryType.EXPENSE : CategoryType.REVENUE
+            const categoryType = inputType ? CategoryType.EXPENSE : CategoryType.REVENUE
             const { response, statusCode } = await api.getCategoriesByType(categoryType);
             if (statusCode === 401) return unauthorized(navigation);
             if (!response.length) return
@@ -99,7 +90,7 @@ const EditTransaction = () => {
             });
             if (!data.length) return
             setCategoriesItems(data);
-            setSelectedCategory(data[0].value)
+            setSelectedCategory(seletedCategory || data[0].value)
         } catch (error) {
             catchErrorMessage(error?.message)
         }
@@ -114,7 +105,7 @@ const EditTransaction = () => {
         setSelectedCategory(item.value);
     }
 
-    function autoFill(data: FullTransaction) {
+    async function autoFill(data: FullTransaction) {
         const { name, amount, transactionDate, dueDate, attachments, category,
             transactionType } = data;
         name && setName(name);
@@ -125,11 +116,11 @@ const EditTransaction = () => {
             symbol: 'R$'
         }).toString());
         transactionType && setType((transactionType === CategoryType.EXPENSE))
+        if (transactionType) { await getCategoriesList((transactionType === CategoryType.EXPENSE), category.id) }
         transactionDate && setDate(new Date(transactionDate));
         dueDate && setDueDate(new Date(date));
         attachments && setAttachmentsImages(attachments)
         paid && setPaid(data.paid);
-        category && setSelectedCategory(category.id)
     }
 
     async function handleSaveTransaction() {
@@ -200,7 +191,9 @@ const EditTransaction = () => {
                     </View>
 
                     <DualButton sectionName={'Tipo'} btn1Name={'Despesa'}
-                        btn2Name={'Receita'} value={type} onChange={setType} />
+                        btn2Name={'Receita'} value={type} onChange={(value: boolean) => {
+                            setType(value); getCategoriesList(value)
+                        }} />
 
                     <DualButton sectionName={'Pagamento'} btn1Name={'Pago'}
                         btn2Name={'Não pago'} value={paid} onChange={setPaid} />
