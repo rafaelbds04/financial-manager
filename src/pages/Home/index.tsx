@@ -223,7 +223,7 @@ export default function Home() {
             </LinearGradient>
         </View>
 
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 0.4 }}>
                 <SlidingUpPanel
                     ref={modalRef}
                     draggableRange={dragRange}
