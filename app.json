@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "DiskFinance",
-    "slug": "DiskFinance",
+    "name": "Finance App",
+    "slug": "Finance App",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
@@ -20,7 +20,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "br.com.diskquentinha.DiskFinance",
+      "package": "rafaelbds04.FinanceApp",
       "versionCode": 1
     },
     "web": {
