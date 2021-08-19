@@ -7,7 +7,7 @@ const catchErrorMessage = (message: string) => {
         type: "danger",
         message: 'Ocorreu um erro',
         description: message,
-        duration: 5000
+        duration: 30000
     })
 }
 

@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     content: {
-        marginTop: -35,
+        marginTop: -70,
         borderTopStartRadius: 40,
         borderTopEndRadius: 40,
         backgroundColor: '#fff',

@@ -74,7 +74,7 @@ export default function Home() {
 
     const [dragRange, setDragRange] = useState({
         top: height - 105,
-        bottom: height - 480
+        bottom: height - 430
     });
 
     const _draggedValue = new Animated.Value(180);

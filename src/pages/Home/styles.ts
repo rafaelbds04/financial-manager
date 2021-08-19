@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 32,
+        paddingTop: 10,
     },
     header: {
         paddingTop: 15,
@@ -30,10 +30,11 @@ const styles = StyleSheet.create({
     },
     summaryContainer: {
         paddingTop: 10,
-        marginBottom: 10
+        // marginBottom: 10
     },
     shortcutsContainerTitle: {
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
         fontSize: 22,
         fontFamily: 'Roboto_700Bold',
         color: '#1e1e1e'

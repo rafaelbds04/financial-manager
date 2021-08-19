@@ -4,7 +4,6 @@ import { Roboto_700Bold } from '@expo-google-fonts/roboto';
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 30,
         paddingHorizontal: 30,
         // alignItems: 'center',
         // justifyContent: 'center',
@@ -17,7 +16,7 @@ const styles = StyleSheet.create({
         marginTop: 50,
     },
     title: {
-        marginTop: 50,
+        marginTop: 15,
         fontSize: 24,
         fontFamily: 'Roboto_700Bold',
         color: '#fff'

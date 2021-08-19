@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
     contaier: {
         flex: 1,
-        marginTop: -35
+        marginTop: -75
     },
     inputContainer: {
         marginTop: 10,

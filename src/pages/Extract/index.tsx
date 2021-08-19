@@ -215,6 +215,9 @@ export default function Extract() {
 
     const modalBody = (
         <View style={styles.modal}>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <AntDesign name="close" size={24} color="#fff" />
+            </TouchableOpacity>
             <View style={styles.content}>
                 <View style={styles.inputContainer} >
                     <Text style={styles.inputTitle} >Nome</Text>

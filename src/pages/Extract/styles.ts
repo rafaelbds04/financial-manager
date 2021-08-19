@@ -3,7 +3,6 @@ import { StyleSheet } from 'react-native'
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 30,
         // paddingHorizontal: 15,
         backgroundColor: '#4643d3'
     },
@@ -51,7 +50,7 @@ const styles = StyleSheet.create({
     modal: {
         flex: 1,
         backgroundColor: 'rgba(70, 67, 211, 0.8)',
-        paddingTop: 50,
+        paddingTop: 20,
         paddingHorizontal: 20,
         alignContent: 'space-between'
     },

@@ -38,7 +38,6 @@ const PageHeader: React.FC<PageHedaerProps> = ({ title, additionalIcon }) => {
 const styles = StyleSheet.create({
     container: {
         padding: 40,
-        paddingTop: 60,
         backgroundColor: '#4643d3',
         height: 160
     },
