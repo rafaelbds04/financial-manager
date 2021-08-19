@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import PageHeader from '../../../components/PageHeader';
 import { showMessage } from "react-native-flash-message";
 import moment from 'moment';
+import { Camera } from 'expo-camera';
 
 interface CodeScannerProps {
   toggleScannerVisible?: Function
@@ -30,6 +31,7 @@ export interface Receipt {
 const CodeScanner: React.FC<CodeScannerProps> = () => {
   const [hasPermission, setHasPermission] = useState<null | boolean>(null);
   const [scanned, setScanned] = useState(false);
+  const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
 
   const navigation = useNavigation();
 
@@ -75,10 +77,18 @@ const CodeScanner: React.FC<CodeScannerProps> = () => {
     <>
       < PageHeader title={'Digitalize o código da NF'} />
       <View style={styles.contaier}>
-        <BarCodeScanner onBarCodeScanned={handleBarCodeScanned} style={{ flex: 1 }}>
+        <Camera onBarCodeScanned={handleBarCodeScanned} style={{ flex: 1 }}
+          type={Camera.Constants.Type.back}
+          flashMode={flashMode}
+          onCameraReady={() => {
+            setFlashMode(Camera.Constants.FlashMode.torch);
+          }}
+          barCodeScannerSettings={{
+            barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
+          }}>
           <View style={styles.scanContainer}>
           </View>
-        </BarCodeScanner>
+        </Camera>
       </View>
     </>
   );
