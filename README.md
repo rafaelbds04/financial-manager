@@ -1,10 +1,10 @@
 <h1 align="center">
   Financial Manager
 </h1>
-<h6 align = "center">
+<h5 align = "center">
     App mobile para simplificar a gestão financeira!
     Feito para pessoas e pequenas empresas, com importação simplificada e rápida de cupom fiscal através de QR Code.
-</h6>
+</h5>
 <p align="center">
   <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/rafaelbds04/financial-manager.svg">
 
@@ -22,7 +22,7 @@
   
   <img alt="GitHub" src="https://img.shields.io/github/license/rafaelbds04/financial-manager.svg">
 </p>
-<div style="text-align:center; height: 70vh"><img src=".github/Screen_1.gif" /></div>
+<div align="center"><img height="550" src=".github/Screen_1.gif" /></div>
 </p>
 
 # ⚡️ Principais recursos
@@ -32,7 +32,7 @@
     - Preenche os dados da transação automaticamente
     - Armazena imagem da NFC-e digital
     - Evita duplicidade de lançamentos
-    <div style="height: 50vh"><img src=".github/receiptImport.gif" /></div>
+    <img height="300" src=".github/receiptImport.gif" />
 * Permite inserção de anexos
 * Controle de pagamentos e vencimentos
 * Gera integridade para os dados
